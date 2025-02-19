@@ -1,5 +1,5 @@
 {
-  "name": "react-antd-template",
+  "name": "khajanchi",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,11 +13,11 @@
     "@ant-design/icons": "^5.6.1",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "antd": "^5.24.0",
+    "axios": "^1.8.1",
     "dayjs": "^1.11.13",
-    "highcharts": "^12.1.2",
-    "highcharts-react-official": "^3.2.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router": "^7.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

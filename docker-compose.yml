@@ -1,0 +1,17 @@
+services:
+  app:
+    restart: always
+    container_name: khajanchi-ui
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - khajanchi-ui-node_modules:/usr/app/node_modules
+      - .:/usr/app
+      # - ./src:/usr/app/src
+      # - ./dist:/usr/app/dist
+    ports:
+      - "5173:5173"
+
+volumes:
+  khajanchi-ui-node_modules:
