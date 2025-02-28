@@ -3,7 +3,7 @@ import TransactionRoutes from './api/v1/transaction/routes.js';
 import helmet from 'helmet';
 import cors from 'cors';
 import DateUtil from './core/dateUtil/DateUtil.js';
-
+import LLMRoutes from './api/v1/llm/routes.js';
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -26,6 +26,7 @@ app.get(`${API_V1}/healthcheck`, (_req: Request, res: Response) => {
 });
 
 app.use(`${API_V1}`, TransactionRoutes);
+app.use(`${API_V1}`, LLMRoutes);
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, () => {
