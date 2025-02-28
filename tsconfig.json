@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                  // Use the latest language features supported by Node.js
+    "module": "NodeNext",                // Leverage native ESM support, if your Node version supports it
+    "moduleResolution": "NodeNext",      // Module resolution that aligns with Node's ESM behavior
+    "esModuleInterop": true,             // Ensures compatibility with legacy CommonJS modules
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "allowJs": true,                     // Allow JavaScript files to be compiled
+    "resolveJsonModule": true,  
+  },
+  "include": [
+    "./src/**/*",
+    "./src/**/*.json",
+    "./src/**/*.js"
+  ]
+}
