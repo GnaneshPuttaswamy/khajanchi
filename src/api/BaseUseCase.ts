@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { Logger } from 'winston';
-import { logger } from '../core/logger/logger.js';
+import { z } from 'zod';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -22,8 +21,6 @@ export abstract class BaseUseCase<
   TRequestQuery = any,
   TData = any,
 > {
-  static logger: Logger = logger;
-
   request: Request<TRequestParams, TResponseBody, TRequestBody, TRequestQuery>;
   response: Response;
 
@@ -63,9 +60,21 @@ export abstract class BaseUseCase<
   async executeAndHandleErrors(): Promise<void> {
     try {
       await this.validate();
+
       const result = await this.execute();
-      this.response.status(200).json(BaseUseCase.success(result));
+
+      if (!result) {
+        this.response.status(200).json(BaseUseCase.success(null));
+      } else {
+        this.response.status(200).json(BaseUseCase.success(result));
+      }
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+        this.response.status(400).json(BaseUseCase.error('VALIDATION_ERROR', errorMessage));
+        return;
+      }
+
       this.response.status(500).json(BaseUseCase.error('INTERNAL_SERVER_ERROR', (error as Error).message));
     }
   }

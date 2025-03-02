@@ -3,7 +3,8 @@ import { AddTransactionUseCase } from './AddTransactionUseCase.js';
 import { GetTransactionUseCase } from './GetTransactionUseCase.js';
 import { DeleteTransactionUseCase } from './DeleteTransactionUseCase.js';
 import { GetAllTransactionsUseCase } from './GetAllTransactionsUseCase.js';
-import { DeleteTransactionParams, GetTransactionParams } from './types.js';
+import { DeleteTransactionParams, GetTransactionParams, UpdateTransactionParams } from './types.js';
+import { UpdateTransactionUseCase } from './UpdateTransactionUseCase.js';
 
 const router = express.Router();
 
@@ -25,6 +26,11 @@ router.get('/transactions/:id', async (req: Request<GetTransactionParams>, res: 
 router.delete('/transactions/:id', async (req: Request<DeleteTransactionParams>, res: Response) => {
   const deleteTransactionUseCase = DeleteTransactionUseCase.create(req, res);
   await deleteTransactionUseCase.executeAndHandleErrors();
+});
+
+router.put('/transactions/:id', async (req: Request<UpdateTransactionParams>, res: Response) => {
+  const updateTransactionUseCase = UpdateTransactionUseCase.create(req, res);
+  await updateTransactionUseCase.executeAndHandleErrors();
 });
 
 export default router;

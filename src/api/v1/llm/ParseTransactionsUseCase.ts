@@ -32,7 +32,7 @@ export class ParseTransactionsUseCase extends BaseUseCase<
 
   async execute() {
     const TransactionSchema = z.object({
-      transaction_date: z
+      date: z
         .string()
         .describe("Date of transaction in ISO 8601 format (e.g., 2021-09-01) if specified else today's date."),
       amount: z.number().describe('Amount of the item'),

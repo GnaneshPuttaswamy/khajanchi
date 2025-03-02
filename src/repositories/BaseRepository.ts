@@ -1,4 +1,14 @@
-import { CreationAttributes, Model, ModelStatic, CreateOptions, FindOptions, DestroyOptions } from 'sequelize';
+import {
+  CreationAttributes,
+  Model,
+  ModelStatic,
+  CreateOptions,
+  FindOptions,
+  DestroyOptions,
+  UpdateOptions,
+  WhereOptions,
+  Op,
+} from 'sequelize';
 
 export abstract class BaseRepository<M extends Model> {
   abstract model(): ModelStatic<M>;
@@ -17,5 +27,19 @@ export abstract class BaseRepository<M extends Model> {
 
   async findById(id: number, findOptions: FindOptions = {}): Promise<M | null> {
     return this.model().findByPk(id, findOptions);
+  }
+
+  async updateById(
+    id: number,
+    data: Partial<CreationAttributes<M>>,
+    updateOptions?: UpdateOptions
+  ): Promise<[affectedCount: number]> {
+    const where: WhereOptions = {
+      id: {
+        [Op.eq]: id,
+      },
+    };
+
+    return this.model().update(data, { ...updateOptions, where });
   }
 }

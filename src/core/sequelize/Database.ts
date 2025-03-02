@@ -18,6 +18,7 @@ class Database {
         dateStrings: true,
         typeCast: true,
         timezone: '+00:00',
+        decimalNumbers: true,
       },
     });
   }

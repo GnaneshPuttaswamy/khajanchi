@@ -14,7 +14,10 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
   async validate() {}
 
   async execute() {
-    const transactions = await this.transactionRepository.findAll();
+    const transactions = await this.transactionRepository.findAll({
+      where: this.request.query,
+    });
+
     return transactions as unknown as GetAllTransactionsData[];
   }
 

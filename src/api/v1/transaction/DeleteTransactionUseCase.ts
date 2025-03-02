@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { TransactionRepository } from '../../../repositories/TransactionRepository.js';
 import { BaseUseCase } from '../../BaseUseCase.js';
 import { DeleteTransactionData, DeleteTransactionParams } from './types.js';
+import { idParamsSchema } from '../../../core/zodSchemas/zodSchemas.js';
 
 export class DeleteTransactionUseCase extends BaseUseCase<DeleteTransactionParams, {}, {}, {}, DeleteTransactionData> {
   transactionRepository: TransactionRepository;
@@ -16,15 +17,7 @@ export class DeleteTransactionUseCase extends BaseUseCase<DeleteTransactionParam
   }
 
   async validate() {
-    DeleteTransactionUseCase.logger.debug('Validating', {
-      className: this.constructor.name,
-      method: 'validate',
-      params: this.request.params,
-    });
-
-    if (!this.request.params.id) {
-      throw new Error('Transaction id is required');
-    }
+    this.request.params = idParamsSchema.parse(this.request.params);
   }
 
   async execute() {
