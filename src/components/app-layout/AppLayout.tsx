@@ -13,14 +13,10 @@ const { Content, Sider } = Layout;
 function AppLayout({
   collapsed,
   setCollapsed,
-  isCompact,
-  setIsCompact,
   isMobile,
 }: {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isCompact: boolean;
-  setIsCompact: (isCompact: boolean) => void;
   isMobile: boolean;
 }) {
   // navigate hook for routing
@@ -114,8 +110,6 @@ function AppLayout({
           <ContentHeader
             collapsed={collapsed}
             setCollapsed={setCollapsed}
-            isCompact={isCompact}
-            setIsCompact={setIsCompact}
             isMobile={isMobile}
             currentPath={location.pathname}
           />
@@ -128,15 +122,9 @@ function AppLayout({
             gap="middle"
           >
             <Routes>
-              <Route path="/" element={<AddTransactionPage isMobile={isMobile} isCompact={isCompact} />} />
-              <Route
-                path="/add-transaction"
-                element={<AddTransactionPage isMobile={isMobile} isCompact={isCompact} />}
-              />
-              <Route
-                path="/transaction-history"
-                element={<AllTransactionsPage isMobile={isMobile} isCompact={isCompact} />}
-              />
+              <Route path="/" element={<AddTransactionPage isMobile={isMobile} />} />
+              <Route path="/add-transaction" element={<AddTransactionPage isMobile={isMobile} />} />
+              <Route path="/transaction-history" element={<AllTransactionsPage isMobile={isMobile} />} />
               <Route path="/settings" element={<div>To be implemented</div>} />
             </Routes>
           </Flex>

@@ -1,14 +1,16 @@
 import { Card, message, Space } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Transaction } from '../../../types/types';
 import axios from 'axios';
 import TransactionsTable from '../../transactions-table/TransactionsTable';
+import { CompactModeContext } from '../../../context/CompactModeContext';
 
-function AllTransactionsPage({ isMobile, isCompact }: { isMobile: boolean; isCompact: boolean }) {
+function AllTransactionsPage({ isMobile }: { isMobile: boolean }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isFetchingTransactions, setIsFetchingTransactions] = useState(false);
   const [fetchingTransactionsError, setFetchingTransactionsError] = useState<string | null>(null);
   const [messageApi, messageContextHolder] = message.useMessage();
+  const { isCompact } = useContext(CompactModeContext);
 
   const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -51,10 +53,7 @@ function AllTransactionsPage({ isMobile, isCompact }: { isMobile: boolean; isCom
     await refreshTransactions();
   };
 
-  const updateTransaction = async (
-    id: React.Key,
-    updatedTransaction: Partial<Omit<Transaction, 'id'>>
-  ) => {
+  const updateTransaction = async (id: React.Key, updatedTransaction: Partial<Omit<Transaction, 'id'>>) => {
     // First get the current transaction
     const currentTransaction = transactions.find((t) => t.id === id);
 
@@ -75,9 +74,7 @@ function AllTransactionsPage({ isMobile, isCompact }: { isMobile: boolean; isCom
 
     // Update local state
     setTransactions((prev) =>
-      prev.map((transaction) =>
-        transaction.id === id ? { ...fullUpdatedTransaction } : transaction
-      )
+      prev.map((transaction) => (transaction.id === id ? { ...fullUpdatedTransaction } : transaction))
     );
 
     await refreshTransactions();
@@ -107,7 +104,6 @@ function AllTransactionsPage({ isMobile, isCompact }: { isMobile: boolean; isCom
         <TransactionsTable
           transactions={transactions}
           isConfirmedTransactions={true}
-          isCompact={isCompact}
           deleteTransaction={deleteTransaction}
           updateTransaction={updateTransaction}
         />

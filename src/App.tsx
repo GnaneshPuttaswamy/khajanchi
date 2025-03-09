@@ -4,6 +4,7 @@ import { ConfigProvider, theme } from 'antd';
 import './App.css';
 import AppLayout from './components/app-layout/AppLayout';
 import { ThemeContext } from './context/ThemeContext';
+import { CompactModeContext } from './context/CompactModeContext';
 // Helper function to check if device is mobile
 const isMobileDevice = () =>
   window.innerWidth <= 768 ||
@@ -11,9 +12,10 @@ const isMobileDevice = () =>
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(() => isMobileDevice());
-  const [isCompact, setIsCompact] = useState(() => isMobileDevice());
+
   const [isMobile, setIsMobile] = useState(() => isMobileDevice());
   const { isDark } = useContext(ThemeContext);
+  const { isCompact } = useContext(CompactModeContext);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -66,13 +68,7 @@ const App: React.FC = () => {
         ].filter(Boolean) as any,
       }}
     >
-      <AppLayout
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
-        isCompact={isCompact}
-        setIsCompact={setIsCompact}
-        isMobile={isMobile}
-      />
+      <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} />
     </ConfigProvider>
   );
 };

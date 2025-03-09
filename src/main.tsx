@@ -6,12 +6,15 @@ import './index.css';
 import App from './App.tsx';
 import { BrowserRouter } from 'react-router';
 import { ThemeProvider } from './context/ThemeContext.tsx';
+import { CompactModeProvider } from './context/CompactModeContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <App />
+        <CompactModeProvider>
+          <App />
+        </CompactModeProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>

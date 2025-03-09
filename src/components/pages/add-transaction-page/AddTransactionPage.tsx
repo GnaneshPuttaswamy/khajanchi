@@ -5,7 +5,7 @@ import { Transaction } from '../../../types/types';
 import axios from 'axios';
 import TransactionsTable from '../../transactions-table/TransactionsTable';
 
-function AddTransactionPage({ isMobile, isCompact }: { isMobile: boolean; isCompact: boolean }) {
+function AddTransactionPage({ isMobile }: { isMobile: boolean }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isFetchingTransactions, setIsFetchingTransactions] = useState(false);
   const [fetchingTransactionsError, setFetchingTransactionsError] = useState<string | null>(null);
@@ -103,7 +103,6 @@ function AddTransactionPage({ isMobile, isCompact }: { isMobile: boolean; isComp
         <TransactionsTable
           transactions={transactions}
           isConfirmedTransactions={false}
-          isCompact={isCompact}
           deleteTransaction={deleteTransaction}
           updateTransaction={updateTransaction}
         />

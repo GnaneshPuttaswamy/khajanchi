@@ -2,14 +2,11 @@ import React, { useContext } from 'react';
 import { Button, Space, Tooltip } from 'antd';
 import { CompressOutlined, ExpandOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { ThemeContext } from '../../../context/ThemeContext';
+import { CompactModeContext } from '../../../context/CompactModeContext';
 
-interface ActionButtonsProps {
-  isCompact: boolean;
-  setIsCompact: (isCompact: boolean) => void;
-}
-
-const ActionButtons: React.FC<ActionButtonsProps> = ({ isCompact, setIsCompact }) => {
+const ActionButtons: React.FC = () => {
   const { isDark, setIsDark } = useContext(ThemeContext);
+  const { isCompact, setIsCompact } = useContext(CompactModeContext);
 
   return (
     <Space>

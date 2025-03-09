@@ -1,5 +1,5 @@
 import { Flex, Form, message, Pagination, Space, Table, TableProps, Tag } from 'antd';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Transaction } from '../../types/types';
 import { ACTION_COLUMN_FIELDS, TRANSACTION_COLUMN_FIELDS } from '../../constants/TransactionTableConstants';
 import dayjs from 'dayjs';
@@ -10,7 +10,7 @@ import {
   transactionsTableReducer,
   TransactionsTableState,
 } from '../../reducers/transactionsTableReducer';
-
+import { CompactModeContext } from '../../context/CompactModeContext';
 const categoryColors: Record<string, string> = {
   food: 'green',
   entertainment: 'blue',
@@ -57,7 +57,6 @@ const baseColumns: TableProps<Transaction>['columns'] = [
 interface MyTableProps {
   transactions: Transaction[];
   isConfirmedTransactions: boolean;
-  isCompact: boolean;
   deleteTransaction: (id: React.Key) => Promise<void>;
   updateTransaction: (id: React.Key, updatedTransaction: Partial<Omit<Transaction, 'id'>>) => Promise<void>;
 }
@@ -73,10 +72,10 @@ const initialState: TransactionsTableState = {
 function TransactionsTable({
   transactions,
   isConfirmedTransactions,
-  isCompact,
   deleteTransaction,
   updateTransaction,
 }: MyTableProps) {
+  const { isCompact } = useContext(CompactModeContext);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [err, setErr] = useState<string | null>(null);
