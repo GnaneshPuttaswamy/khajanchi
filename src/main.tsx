@@ -7,13 +7,16 @@ import App from './App.tsx';
 import { BrowserRouter } from 'react-router';
 import { ThemeProvider } from './context/ThemeContext.tsx';
 import { CompactModeProvider } from './context/CompactModeContext.tsx';
+import { IsMobileProvider } from './context/IsMobileContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
         <CompactModeProvider>
-          <App />
+          <IsMobileProvider>
+            <App />
+          </IsMobileProvider>
         </CompactModeProvider>
       </ThemeProvider>
     </BrowserRouter>

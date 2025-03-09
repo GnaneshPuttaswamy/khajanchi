@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button, Flex, Space } from 'antd';
 import { LayoutOutlined } from '@ant-design/icons';
 import PageBreadcrumb from './PageBreadcrumb';
 import ActionButtons from './ActionButtons';
+import { IsMobileContext } from '../../../context/IsMobileContext';
 
 interface ContentHeaderProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isMobile: boolean;
   currentPath: string;
 }
 
-const ContentHeader: React.FC<ContentHeaderProps> = ({ collapsed, setCollapsed, isMobile, currentPath }) => {
+const ContentHeader: React.FC<ContentHeaderProps> = ({ collapsed, setCollapsed, currentPath }) => {
+  const { isMobile } = useContext(IsMobileContext);
   return (
     <Flex
       style={{

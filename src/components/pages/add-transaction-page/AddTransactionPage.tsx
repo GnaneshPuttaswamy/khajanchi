@@ -5,7 +5,7 @@ import { Transaction } from '../../../types/types';
 import axios from 'axios';
 import TransactionsTable from '../../transactions-table/TransactionsTable';
 
-function AddTransactionPage({ isMobile }: { isMobile: boolean }) {
+function AddTransactionPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isFetchingTransactions, setIsFetchingTransactions] = useState(false);
   const [fetchingTransactionsError, setFetchingTransactionsError] = useState<string | null>(null);
@@ -87,7 +87,7 @@ function AddTransactionPage({ isMobile }: { isMobile: boolean }) {
   return (
     <>
       {messageContextHolder}
-      <AddExpenseForm isMobile={isMobile} addTransaction={addTransaction} refreshTransactions={refreshTransactions} />
+      <AddExpenseForm addTransaction={addTransaction} refreshTransactions={refreshTransactions} />
       <Card
         loading={isFetchingTransactions}
         title={

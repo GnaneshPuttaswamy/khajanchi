@@ -3,7 +3,7 @@ import { Menu, MenuProps, Avatar, Typography, Button, Flex, Space } from 'antd';
 import { UserOutlined, LayoutOutlined, TransactionOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { ThemeContext } from '../../context/ThemeContext';
-
+import { IsMobileContext } from '../../context/IsMobileContext';
 type MenuItem = Required<MenuProps>['items'][number];
 
 function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem {
@@ -18,13 +18,13 @@ function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode,
 interface SideMenuProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isMobile: boolean;
 }
 
-const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed, isMobile }) => {
+const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isDark } = useContext(ThemeContext);
+  const { isMobile } = useContext(IsMobileContext);
 
   const items: MenuItem[] = [
     getItem(<Typography.Text>Add Transaction</Typography.Text>, '1', <TransactionOutlined />),

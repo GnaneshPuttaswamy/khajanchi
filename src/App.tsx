@@ -5,17 +5,14 @@ import './App.css';
 import AppLayout from './components/app-layout/AppLayout';
 import { ThemeContext } from './context/ThemeContext';
 import { CompactModeContext } from './context/CompactModeContext';
-// Helper function to check if device is mobile
-const isMobileDevice = () =>
-  window.innerWidth <= 768 ||
-  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+import { IsMobileContext, isMobileDevice } from './context/IsMobileContext';
 
 const App: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(() => isMobileDevice());
-
-  const [isMobile, setIsMobile] = useState(() => isMobileDevice());
+  const { isMobile, setIsMobile } = useContext(IsMobileContext);
   const { isDark } = useContext(ThemeContext);
   const { isCompact } = useContext(CompactModeContext);
+
+  const [collapsed, setCollapsed] = useState(isMobile);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -36,7 +33,7 @@ const App: React.FC = () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(resizeTimer);
     };
-  }, []);
+  }, [setIsMobile, setCollapsed]);
 
   return (
     <ConfigProvider
@@ -68,7 +65,7 @@ const App: React.FC = () => {
         ].filter(Boolean) as any,
       }}
     >
-      <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} />
+      <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} />
     </ConfigProvider>
   );
 };

@@ -5,7 +5,7 @@ import axios from 'axios';
 import TransactionsTable from '../../transactions-table/TransactionsTable';
 import { CompactModeContext } from '../../../context/CompactModeContext';
 
-function AllTransactionsPage({ isMobile }: { isMobile: boolean }) {
+function AllTransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isFetchingTransactions, setIsFetchingTransactions] = useState(false);
   const [fetchingTransactionsError, setFetchingTransactionsError] = useState<string | null>(null);

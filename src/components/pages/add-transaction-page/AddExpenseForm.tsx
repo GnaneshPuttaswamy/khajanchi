@@ -1,6 +1,7 @@
 import { Button, Form, Input, Card, message } from 'antd';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Transaction } from '../../../types/types';
+import { IsMobileContext } from '../../../context/IsMobileContext';
 
 const placeholderText = `Describe your transactions in natural language. For example: 
 '₹90 at grocery store, ₹45 for bus pass
@@ -9,7 +10,6 @@ const placeholderText = `Describe your transactions in natural language. For exa
 const validationMessage = 'Please enter your transaction details';
 
 interface AddExpenseFormProps {
-  isMobile: boolean;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   refreshTransactions: () => void;
 }
@@ -38,10 +38,11 @@ const parseTransactionText = async (transactionText: string): Promise<Omit<Trans
   }
 };
 
-function AddExpenseForm({ isMobile, addTransaction, refreshTransactions }: AddExpenseFormProps) {
+function AddExpenseForm({ addTransaction, refreshTransactions }: AddExpenseFormProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const { isMobile } = useContext(IsMobileContext);
 
   const handleFinish = async (values: { transactionText: string }) => {
     try {

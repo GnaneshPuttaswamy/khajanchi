@@ -7,18 +7,11 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router';
 import SideMenu from './SideMenu';
 import ContentHeader from './content-header/ContentHeader';
 import { ThemeContext } from '../../context/ThemeContext';
-
+import { IsMobileContext } from '../../context/IsMobileContext';
 const { Content, Sider } = Layout;
 
-function AppLayout({
-  collapsed,
-  setCollapsed,
-  isMobile,
-}: {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-  isMobile: boolean;
-}) {
+function AppLayout({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (collapsed: boolean) => void }) {
+  const { isMobile } = useContext(IsMobileContext);
   // navigate hook for routing
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +82,7 @@ function AppLayout({
           top: 0,
         }}
       >
-        <SideMenu collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} />
+        <SideMenu collapsed={collapsed} setCollapsed={setCollapsed} />
       </Sider>
       <Layout
         style={{
@@ -107,12 +100,7 @@ function AppLayout({
           }}
           className="content-container"
         >
-          <ContentHeader
-            collapsed={collapsed}
-            setCollapsed={setCollapsed}
-            isMobile={isMobile}
-            currentPath={location.pathname}
-          />
+          <ContentHeader collapsed={collapsed} setCollapsed={setCollapsed} currentPath={location.pathname} />
           <Flex
             flex={1}
             style={{
@@ -122,9 +110,9 @@ function AppLayout({
             gap="middle"
           >
             <Routes>
-              <Route path="/" element={<AddTransactionPage isMobile={isMobile} />} />
-              <Route path="/add-transaction" element={<AddTransactionPage isMobile={isMobile} />} />
-              <Route path="/transaction-history" element={<AllTransactionsPage isMobile={isMobile} />} />
+              <Route path="/" element={<AddTransactionPage />} />
+              <Route path="/add-transaction" element={<AddTransactionPage />} />
+              <Route path="/transaction-history" element={<AllTransactionsPage />} />
               <Route path="/settings" element={<div>To be implemented</div>} />
             </Routes>
           </Flex>
