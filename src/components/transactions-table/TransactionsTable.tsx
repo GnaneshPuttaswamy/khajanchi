@@ -1,10 +1,15 @@
 import { Flex, Form, message, Pagination, Space, Table, TableProps, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { Transaction } from '../../types/types';
 import { ACTION_COLUMN_FIELDS, TRANSACTION_COLUMN_FIELDS } from '../../constants/TransactionTableConstants';
 import dayjs from 'dayjs';
 import { CancelButton, ConfirmButton, DeleteButton, EditButton, SaveButton } from './TransactionActionButtons';
 import EditableCell from './EditableCell';
+import {
+  TransactionsTableActionType,
+  transactionsTableReducer,
+  TransactionsTableState,
+} from '../../reducers/transactionsTableReducer';
 
 const categoryColors: Record<string, string> = {
   food: 'green',
@@ -57,6 +62,14 @@ interface MyTableProps {
   updateTransaction: (id: React.Key, updatedTransaction: Partial<Omit<Transaction, 'id'>>) => Promise<void>;
 }
 
+const initialState: TransactionsTableState = {
+  currentlyEditingId: null,
+  isFormDisabled: false,
+  confirmingTransactionIds: [],
+  deletingTransactionIds: [],
+  savingTransactionIds: [],
+};
+
 function TransactionsTable({
   transactions,
   isConfirmedTransactions,
@@ -79,17 +92,9 @@ function TransactionsTable({
     }
   }, [err, messageApi]);
 
-  // Only one transaction can be edited at a time.
-  const [currentlyEditingId, setCurrentlyEditingId] = useState<React.Key | null>(null);
-
-  // Disables form fields when a transaction is being saved.
-  const [isFormDisabled, setIsFormDisabled] = useState<boolean>(false);
-
-  // Tracks IDs of transactions that are being confirmed, deleted, or saved.
-  // Used to disable buttons and show loading indicators for transactions being confirmed, deleted, or saved.
-  const [confirmingTransactionIds, setConfirmingTransactionIds] = useState<React.Key[]>([]);
-  const [deletingTransactionIds, setDeletingTransactionIds] = useState<React.Key[]>([]);
-  const [savingTransactionIds, setSavingTransactionIds] = useState<React.Key[]>([]);
+  const [transactionsTableState, dispatch] = useReducer(transactionsTableReducer, initialState);
+  const { currentlyEditingId, isFormDisabled, confirmingTransactionIds, deletingTransactionIds, savingTransactionIds } =
+    transactionsTableState;
 
   // Manages the confirmation process for transactions.
   // 1. Resets the editing state if the transaction is being edited.
@@ -99,18 +104,21 @@ function TransactionsTable({
   const onConfirm = async (transactionId: React.Key) => {
     try {
       if (confirmingTransactionIds.includes(transactionId)) {
-        setCurrentlyEditingId(null);
+        dispatch({ type: TransactionsTableActionType.CLEAR_EDITING_ID });
       }
 
-      setConfirmingTransactionIds((prev) => [...prev, transactionId]);
+      // setConfirmingTransactionIds((prev) => [...prev, transactionId]);
+      dispatch({ type: TransactionsTableActionType.ADD_CONFIRMING_TRANSACTION_ID, payload: { id: transactionId } });
 
       await updateTransaction(transactionId, { isConfirmed: true });
     } catch (error) {
       console.log('Error while deleting transaction => ', error);
-      setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
+      // setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
+      dispatch({ type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID, payload: { id: transactionId } });
       setErr('Error while deleting transaction');
     } finally {
-      setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
+      // setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
+      dispatch({ type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID, payload: { id: transactionId } });
     }
   };
 
@@ -125,7 +133,7 @@ function TransactionsTable({
       [TRANSACTION_COLUMN_FIELDS.DESCRIPTION]: transactionToEdit.description,
     });
 
-    setCurrentlyEditingId(transactionToEdit.id);
+    dispatch({ type: TransactionsTableActionType.SET_EDITING_ID, payload: { id: transactionToEdit.id } });
   };
 
   // Deletes a transaction.
@@ -134,21 +142,21 @@ function TransactionsTable({
   // 3. Removes the transaction ID from the deleting list, regardless of success or failure.
   const onDelete = async (transactionId: React.Key) => {
     try {
-      setDeletingTransactionIds((prev) => [...prev, transactionId]);
+      dispatch({ type: TransactionsTableActionType.ADD_DELETING_TRANSACTION_ID, payload: { id: transactionId } });
       await deleteTransaction(transactionId);
     } catch (error) {
       console.log('Error while deleting transaction => ', error);
-      setDeletingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
+      dispatch({ type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID, payload: { id: transactionId } });
       setErr('Error while deleting transaction');
     } finally {
-      setDeletingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
+      dispatch({ type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID, payload: { id: transactionId } });
     }
   };
 
   // Resets the editing state.
   const onCancel = () => {
     form.resetFields();
-    setCurrentlyEditingId(null);
+    dispatch({ type: TransactionsTableActionType.CLEAR_EDITING_ID });
   };
 
   // Saves the edited transaction with the new values.
@@ -161,18 +169,18 @@ function TransactionsTable({
   // 7. Resets the current editing state.
   const onSave = async (transactionId: React.Key) => {
     try {
-      setSavingTransactionIds((prev) => [...prev, transactionId]);
-      setIsFormDisabled(true);
+      dispatch({ type: TransactionsTableActionType.ADD_SAVING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({ type: TransactionsTableActionType.SET_FORM_DISABLED });
       const newValues = await form.validateFields();
       await updateTransaction(transactionId, newValues);
       form.resetFields();
-      setCurrentlyEditingId(null);
+      dispatch({ type: TransactionsTableActionType.CLEAR_EDITING_ID });
     } catch (error) {
       console.log(`Error while saving the record with id=${transactionId}`, error);
       setErr('Error while saving the record');
     } finally {
-      setSavingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
-      setIsFormDisabled(false);
+      dispatch({ type: TransactionsTableActionType.REMOVE_SAVING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({ type: TransactionsTableActionType.CLEAR_FORM_DISABLED });
     }
   };
 
