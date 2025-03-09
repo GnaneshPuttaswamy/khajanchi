@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { ConfigProvider, theme } from 'antd';
 import './App.css';
 import AppLayout from './components/app-layout/AppLayout';
-
+import { ThemeContext } from './context/ThemeContext';
 // Helper function to check if device is mobile
 const isMobileDevice = () =>
   window.innerWidth <= 768 ||
@@ -11,9 +11,9 @@ const isMobileDevice = () =>
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(() => isMobileDevice());
-  const [isDark, setIsDark] = useState(false);
   const [isCompact, setIsCompact] = useState(() => isMobileDevice());
   const [isMobile, setIsMobile] = useState(() => isMobileDevice());
+  const { isDark } = useContext(ThemeContext);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -69,8 +69,6 @@ const App: React.FC = () => {
       <AppLayout
         collapsed={collapsed}
         setCollapsed={setCollapsed}
-        isDark={isDark}
-        setIsDark={setIsDark}
         isCompact={isCompact}
         setIsCompact={setIsCompact}
         isMobile={isMobile}

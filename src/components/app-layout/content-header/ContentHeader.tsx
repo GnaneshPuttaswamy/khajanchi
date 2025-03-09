@@ -7,8 +7,6 @@ import ActionButtons from './ActionButtons';
 interface ContentHeaderProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isDark: boolean;
-  setIsDark: (isDark: boolean) => void;
   isCompact: boolean;
   setIsCompact: (isCompact: boolean) => void;
   isMobile: boolean;
@@ -18,8 +16,6 @@ interface ContentHeaderProps {
 const ContentHeader: React.FC<ContentHeaderProps> = ({
   collapsed,
   setCollapsed,
-  isDark,
-  setIsDark,
   isCompact,
   setIsCompact,
   isMobile,
@@ -51,7 +47,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
         <PageBreadcrumb path={currentPath} />
       </Space>
 
-      <ActionButtons isDark={isDark} setIsDark={setIsDark} isCompact={isCompact} setIsCompact={setIsCompact} />
+      <ActionButtons isCompact={isCompact} setIsCompact={setIsCompact} />
     </Flex>
   );
 };

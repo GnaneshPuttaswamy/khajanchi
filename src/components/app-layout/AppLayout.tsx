@@ -1,27 +1,24 @@
 import { Flex } from 'antd';
 import { Layout, theme } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import AllTransactionsPage from '../pages/all-transactions-page/AllTransactionsPage';
 import AddTransactionPage from '../pages/add-transaction-page/AddTransactionPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router';
 import SideMenu from './SideMenu';
 import ContentHeader from './content-header/ContentHeader';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const { Content, Sider } = Layout;
 
 function AppLayout({
   collapsed,
   setCollapsed,
-  isDark,
-  setIsDark,
   isCompact,
   setIsCompact,
   isMobile,
 }: {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isDark: boolean;
-  setIsDark: (isDark: boolean) => void;
   isCompact: boolean;
   setIsCompact: (isCompact: boolean) => void;
   isMobile: boolean;
@@ -29,7 +26,7 @@ function AppLayout({
   // navigate hook for routing
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { isDark } = useContext(ThemeContext);
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
@@ -96,7 +93,7 @@ function AppLayout({
           top: 0,
         }}
       >
-        <SideMenu collapsed={collapsed} setCollapsed={setCollapsed} isDark={isDark} isMobile={isMobile} />
+        <SideMenu collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} />
       </Sider>
       <Layout
         style={{
@@ -117,8 +114,6 @@ function AppLayout({
           <ContentHeader
             collapsed={collapsed}
             setCollapsed={setCollapsed}
-            isDark={isDark}
-            setIsDark={setIsDark}
             isCompact={isCompact}
             setIsCompact={setIsCompact}
             isMobile={isMobile}
