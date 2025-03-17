@@ -1,0 +1,17 @@
+services:
+  app-web:
+    restart: always
+    container_name: khajanchi-ui
+    build: 
+      context: ../../
+      dockerfile: ./packages/frontend/Dockerfile
+    volumes:
+      - khajanchi-ui-node_modules:/usr/app/packages/frontend/node_modules
+      - .:/usr/app/packages/frontend
+    ports:
+      - "5173:5173"
+    working_dir: /usr/app/packages/frontend
+    command: ["pnpm", "run", "dev", "--host", "0.0.0.0"]
+
+volumes:
+  khajanchi-ui-node_modules:
