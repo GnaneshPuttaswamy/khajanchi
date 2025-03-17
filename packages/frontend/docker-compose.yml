@@ -5,6 +5,8 @@ services:
     build: 
       context: ../../
       dockerfile: ./packages/frontend/Dockerfile
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:9000/api/v1}
     volumes:
       - khajanchi-ui-node_modules:/usr/app/packages/frontend/node_modules
       - .:/usr/app/packages/frontend
