@@ -1,0 +1,45 @@
+services:
+  app-backend:
+    restart: always
+    container_name: khajanchi-api
+    build: 
+      context: ../../
+      dockerfile: ./packages/backend/Dockerfile
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_DIALECT=${DB_DIALECT}
+    volumes:
+      - khajanchi-api-node_modules:/usr/app/packages/backend/node_modules
+      - .:/usr/app/packages/backend
+    ports:
+      - "9000:3000"
+    working_dir: /usr/app/packages/backend  # Set working directory
+    command: sh -c "pnpm run db:migrate && pnpm run db:seed:all && pnpm run dev"  # Override the CMD
+    depends_on:
+      db:
+        condition: service_healthy  
+  db:
+    image: mysql:8.4
+    container_name: khajanchi-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - khajanchi-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  khajanchi-api-node_modules:
+  khajanchi-db-data:

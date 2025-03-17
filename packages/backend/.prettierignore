@@ -1,0 +1,7 @@
+dist
+.git
+.husky
+.nvmrc
+LICENSE
+node_modules
+pnpm-lock.yaml
