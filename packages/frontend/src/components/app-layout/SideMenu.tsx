@@ -1,12 +1,23 @@
 import React, { useContext } from 'react';
 import { Menu, MenuProps, Avatar, Typography, Button, Flex, Space } from 'antd';
-import { UserOutlined, LayoutOutlined, TransactionOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  LayoutOutlined,
+  TransactionOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { ThemeContext } from '../../context/ThemeContext';
 import { IsMobileContext } from '../../context/IsMobileContext';
 type MenuItem = Required<MenuProps>['items'][number];
 
-function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem {
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[]
+): MenuItem {
   return {
     key,
     icon,
@@ -27,9 +38,21 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   const { isMobile } = useContext(IsMobileContext);
 
   const items: MenuItem[] = [
-    getItem(<Typography.Text>Add Transaction</Typography.Text>, '1', <TransactionOutlined />),
-    getItem(<Typography.Text>Transaction History</Typography.Text>, '2', <HistoryOutlined />),
-    getItem(<Typography.Text>Settings</Typography.Text>, '3', <SettingOutlined />),
+    getItem(
+      <Typography.Text>Add Transaction</Typography.Text>,
+      '1',
+      <TransactionOutlined />
+    ),
+    getItem(
+      <Typography.Text>Transaction History</Typography.Text>,
+      '2',
+      <HistoryOutlined />
+    ),
+    getItem(
+      <Typography.Text>Settings</Typography.Text>,
+      '3',
+      <SettingOutlined />
+    ),
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -70,8 +93,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
         }}
       >
         <Flex gap="small" align="center">
-          <Avatar size={!isMobile ? 'large' : undefined} icon={<UserOutlined />} />
-          <Typography.Text strong>Gnanesh</Typography.Text>
+          <Avatar
+            size={!isMobile ? 'large' : undefined}
+            icon={<UserOutlined />}
+          />
+          <Typography.Text strong>User</Typography.Text>
         </Flex>
         <Button
           hidden={collapsed}

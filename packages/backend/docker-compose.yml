@@ -1,10 +1,10 @@
 services:
-  app:
+  app-backend:
     restart: always
     container_name: khajanchi-api
     build: 
-      context: .
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: ./packages/backend/Dockerfile
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -14,12 +14,12 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_DIALECT=${DB_DIALECT}
     volumes:
-      - khajanchi-api-node_modules:/usr/app/node_modules
-      - .:/usr/app
-      # - ./src:/usr/app/src
-      # - ./dist:/usr/app/dist
+      - khajanchi-api-node_modules:/usr/app/packages/backend/node_modules
+      - .:/usr/app/packages/backend
     ports:
       - "9000:3000"
+    working_dir: /usr/app/packages/backend  # Set working directory
+    command: sh -c "pnpm run db:migrate && pnpm run db:seed:all && pnpm run dev"  # Override the CMD
     depends_on:
       db:
         condition: service_healthy  

@@ -6,10 +6,10 @@ WORKDIR /usr/app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
 
 RUN pnpm install --frozen-lockfile
 
-# COPY . .
+COPY . .
 
-# CMD pnpm run db:migrate && pnpm run db:seed:all && pnpm run dev
+CMD ["pnpm", "run", "dev"] 
