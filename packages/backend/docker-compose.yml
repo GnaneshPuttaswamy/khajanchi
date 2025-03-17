@@ -8,18 +8,20 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - DB_HOST=db
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_DIALECT=${DB_DIALECT}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-mydbpwd}
+      - DB_DATABASE=${DB_DATABASE:-khajanchi}
+      - DB_DIALECT=${DB_DIALECT:-mysql}
+      - DB_PORT=${DB_PORT:-3306}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
       - khajanchi-api-node_modules:/usr/app/packages/backend/node_modules
       - .:/usr/app/packages/backend
     ports:
       - "9000:3000"
-    working_dir: /usr/app/packages/backend  # Set working directory
-    command: sh -c "pnpm run db:migrate && pnpm run db:seed:all && pnpm run dev"  # Override the CMD
+    working_dir: /usr/app/packages/backend
+    command: sh -c "pnpm run db:migrate && pnpm run db:seed:all && pnpm run dev"
     depends_on:
       db:
         condition: service_healthy  
