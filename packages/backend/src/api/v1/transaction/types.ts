@@ -45,6 +45,11 @@ export type GetTransactionParams = IdParams;
 export type GetTransactionData = AddTransactionData;
 
 // GetAllTransactionsUseCase
+export const getAllTransactionsQuerySchema = z.object({
+  isConfirmed: z.preprocess((val) => val === 'true', z.boolean().optional().default(false)),
+});
+export type GetAllTransactionsQuery = z.infer<typeof getAllTransactionsQuerySchema>;
+
 export type GetAllTransactionsData = AddTransactionData;
 
 // DeleteTransactionUseCase
