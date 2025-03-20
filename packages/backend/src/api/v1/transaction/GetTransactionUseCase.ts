@@ -21,7 +21,15 @@ export class GetTransactionUseCase extends BaseUseCase<GetTransactionParams, {},
   }
 
   async execute() {
-    const transaction = await this.transactionRepository.findById(this.request.params.id);
+    const user: any = await this.authenticate();
+
+    const transaction = await this.transactionRepository.model().findOne({
+      where: {
+        id: this.request.params.id,
+        userId: user.id,
+      },
+    });
+
     return transaction as unknown as GetTransactionData;
   }
 

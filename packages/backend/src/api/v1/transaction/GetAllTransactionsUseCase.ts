@@ -20,8 +20,13 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
   }
 
   async execute() {
+    const user: any = await this.authenticate();
+
     const transactions = await this.transactionRepository.findAll({
-      where: this.request.query,
+      where: {
+        ...this.request.query,
+        userId: user.id,
+      },
     });
 
     return transactions as unknown as GetAllTransactionsData[];
