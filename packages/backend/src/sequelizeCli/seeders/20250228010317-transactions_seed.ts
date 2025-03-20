@@ -12,6 +12,20 @@ export default {
       dbTransaction = await queryInterface.sequelize.transaction();
 
       await queryInterface.bulkInsert(
+        DATABASE_CONSTANTS.TABLES.USER,
+        [
+          {
+            id: 1,
+            email: 'demo@gmail.com',
+            password: '$2b$10$xcVfbCQXaEiiNNmKlNDnvukbZOcpzehYlXPUHRYfbmZGexZxyCgKW',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        { transaction: dbTransaction }
+      );
+
+      await queryInterface.bulkInsert(
         DATABASE_CONSTANTS.TABLES.TRANSACTION,
         [
           {
@@ -20,6 +34,7 @@ export default {
             category: 'groceries',
             description: 'Weekly grocery shopping',
             isConfirmed: true,
+            userId: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -29,6 +44,7 @@ export default {
             category: 'utilities',
             description: 'Internet bill',
             isConfirmed: true,
+            userId: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -38,6 +54,7 @@ export default {
             category: 'rent',
             description: 'Monthly rent payment',
             isConfirmed: true,
+            userId: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -47,6 +64,7 @@ export default {
             category: 'dining',
             description: 'Dinner with friends',
             isConfirmed: false,
+            userId: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -56,6 +74,7 @@ export default {
             category: 'shopping',
             description: 'New headphones',
             isConfirmed: false,
+            userId: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -77,6 +96,8 @@ export default {
       dbTransaction = await queryInterface.sequelize.transaction();
 
       await queryInterface.bulkDelete(DATABASE_CONSTANTS.TABLES.TRANSACTION, {}, { transaction: dbTransaction });
+
+      await queryInterface.bulkDelete(DATABASE_CONSTANTS.TABLES.USER, {}, { transaction: dbTransaction });
 
       await dbTransaction.commit();
     } catch (error) {

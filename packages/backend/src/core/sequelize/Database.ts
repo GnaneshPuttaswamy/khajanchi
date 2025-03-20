@@ -11,7 +11,7 @@ class Database {
       logging: process.env.NODE_ENV === 'development',
       define: {
         timestamps: true,
-        paranoid: true,
+        paranoid: false,
       },
       timezone: '+00:00',
       dialectOptions: {

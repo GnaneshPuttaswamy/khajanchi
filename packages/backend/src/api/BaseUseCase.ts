@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { UserRepository } from '../repositories/UserRepository.js';
+import jwt from 'jsonwebtoken';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -55,6 +57,32 @@ export abstract class BaseUseCase<
   constructor(request: Request<TRequestParams, TResponseBody, TRequestBody, TRequestQuery>, response: Response) {
     this.request = request;
     this.response = response;
+  }
+
+  async authenticate() {
+    try {
+      let token = this.request.headers.authorization?.split(' ')[1];
+
+      if (!token) {
+        throw new Error('Unauthorised request!!');
+      }
+
+      const payload: any = jwt.verify(token, process.env.JWT_SECRET!);
+
+      const userRepository = new UserRepository();
+      const user = await userRepository.model().findByPk(payload?.id, {
+        attributes: { exclude: ['password'] },
+        raw: true,
+      });
+
+      if (!user) {
+        throw new Error("User doesn't exist.");
+      }
+
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async executeAndHandleErrors(): Promise<void> {

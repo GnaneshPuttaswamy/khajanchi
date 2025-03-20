@@ -37,7 +37,20 @@ export class UpdateTransactionUseCase extends BaseUseCase<
   }
 
   async execute() {
-    await this.transactionRepository.updateById(this.request.params.id, this.request.body);
+    const user: any = await this.authenticate();
+
+    await this.transactionRepository.model().update(
+      {
+        ...this.request.body,
+        userId: user.id,
+      },
+      {
+        where: {
+          id: this.request.params.id,
+          userId: user.id,
+        },
+      }
+    );
   }
 
   static create(request: Request<UpdateTransactionParams, {}, AddTransactionRequest, {}>, response: Response) {

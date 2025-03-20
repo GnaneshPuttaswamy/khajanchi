@@ -21,8 +21,13 @@ export class DeleteTransactionUseCase extends BaseUseCase<DeleteTransactionParam
   }
 
   async execute() {
-    const deleteCount = await this.transactionRepository.delete(this.request.params.id, {
-      force: true,
+    const user: any = await this.authenticate();
+
+    const deleteCount = await this.transactionRepository.model().destroy({
+      where: {
+        id: this.request.params.id,
+        userId: user.id,
+      },
     });
 
     if (deleteCount === 0) {

@@ -3,7 +3,6 @@ import { TransactionRepository } from '../../../repositories/TransactionReposito
 import { BaseUseCase } from '../../BaseUseCase.js';
 import { AddTransactionRequest, AddTransactionData, addTransactionRequestSchema } from './types.js';
 import DateUtil from '../../../core/dateUtil/DateUtil.js';
-import { logger } from '../../../core/logger/logger.js';
 
 export class AddTransactionUseCase extends BaseUseCase<{}, {}, AddTransactionRequest, {}, AddTransactionData> {
   transactionRepository: TransactionRepository;
@@ -21,17 +20,17 @@ export class AddTransactionUseCase extends BaseUseCase<{}, {}, AddTransactionReq
   }
 
   async validate() {
-    logger.debug('Validating', {
-      className: this.constructor.name,
-      method: 'validate',
-      request: this.request.body,
-    });
-
     this.request.body = addTransactionRequestSchema.parse(this.request.body);
   }
 
   async execute() {
-    const transaction = await this.transactionRepository.add(this.request.body);
+    const user: any = await this.authenticate();
+
+    const transaction = await this.transactionRepository.add({
+      ...this.request.body,
+      userId: user?.id,
+    });
+
     return transaction as unknown as AddTransactionData;
   }
 
