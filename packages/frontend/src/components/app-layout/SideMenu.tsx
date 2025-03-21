@@ -1,15 +1,27 @@
 import React, { useContext } from 'react';
-import { Menu, MenuProps, Avatar, Typography, Button, Flex, Space } from 'antd';
+import {
+  Menu,
+  MenuProps,
+  Avatar,
+  Typography,
+  Button,
+  Flex,
+  Space,
+  Dropdown,
+} from 'antd';
 import {
   UserOutlined,
   LayoutOutlined,
   TransactionOutlined,
   HistoryOutlined,
   SettingOutlined,
+  DownOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { ThemeContext } from '../../context/ThemeContext';
 import { IsMobileContext } from '../../context/IsMobileContext';
+import { AuthContext } from '../../context/AuthContext';
 type MenuItem = Required<MenuProps>['items'][number];
 
 function getItem(
@@ -36,6 +48,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   const location = useLocation();
   const { isDark } = useContext(ThemeContext);
   const { isMobile } = useContext(IsMobileContext);
+  const { signout } = useContext(AuthContext);
 
   const items: MenuItem[] = [
     getItem(
@@ -78,6 +91,19 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
     return ['1']; // Default to Add Transaction
   };
 
+  const handleSignOut = () => {
+    signout();
+  };
+
+  const userMenuItems = [
+    {
+      key: 'signout',
+      icon: <LogoutOutlined />,
+      label: 'Sign Out',
+      onClick: handleSignOut,
+    },
+  ];
+
   return (
     <>
       <Space
@@ -92,13 +118,22 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
           pointerEvents: collapsed ? 'none' : 'auto',
         }}
       >
-        <Flex gap="small" align="center">
-          <Avatar
-            size={!isMobile ? 'large' : undefined}
-            icon={<UserOutlined />}
-          />
-          <Typography.Text strong>User</Typography.Text>
-        </Flex>
+        <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+          <Flex gap="small" align="center">
+            <Avatar
+              size={!isMobile ? 'large' : undefined}
+              icon={<UserOutlined />}
+            />
+            <Typography.Text strong>User</Typography.Text>
+            <DownOutlined
+              style={{
+                fontSize: 10,
+                position: 'relative',
+                top: 1,
+              }}
+            />
+          </Flex>
+        </Dropdown>
         <Button
           hidden={collapsed}
           size={!isMobile ? 'large' : undefined}

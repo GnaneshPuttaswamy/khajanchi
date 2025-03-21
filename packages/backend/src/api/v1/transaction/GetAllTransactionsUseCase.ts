@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { TransactionRepository } from '../../../repositories/TransactionRepository.js';
 import { BaseUseCase } from '../../BaseUseCase.js';
 import { GetAllTransactionsData, GetAllTransactionsQuery, getAllTransactionsQuerySchema } from './types.js';
+import { logger } from '../../../core/logger/logger.js';
 
 export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAllTransactionsData[]> {
   transactionRepository: TransactionRepository;
@@ -20,16 +21,22 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
   }
 
   async execute() {
-    const user: any = await this.authenticate();
+    let user: any;
+    try {
+      user = await this.authenticate();
 
-    const transactions = await this.transactionRepository.findAll({
-      where: {
-        ...this.request.query,
-        userId: user.id,
-      },
-    });
+      const transactions = await this.transactionRepository.findAll({
+        where: {
+          ...this.request.query,
+          userId: user.id,
+        },
+      });
 
-    return transactions as unknown as GetAllTransactionsData[];
+      return transactions as unknown as GetAllTransactionsData[];
+    } catch (error) {
+      logger.error('GetAllTransactionsUseCase.execute() error', error);
+      throw error;
+    }
   }
 
   static create(request: Request<{}, {}, GetAllTransactionsQuery, {}>, response: Response) {

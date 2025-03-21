@@ -2,6 +2,7 @@ import { Button, Form, Input, Card, message } from 'antd';
 import React, { useContext, useState } from 'react';
 import { Transaction } from '../../../types/types';
 import { IsMobileContext } from '../../../context/IsMobileContext';
+import axios from 'axios';
 
 const placeholderText = `Describe your transactions in natural language. For example: 
 '₹90 at grocery store, ₹45 for bus pass
@@ -14,31 +15,33 @@ interface AddExpenseFormProps {
   refreshTransactions: () => void;
 }
 
-const parseTransactionText = async (transactionText: string): Promise<Omit<Transaction, 'id'>[]> => {
+const parseTransactionText = async (
+  transactionText: string
+): Promise<Omit<Transaction, 'id'>[]> => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/parse-transactions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/parse-transactions`,
+      {
         transactionsDescription: transactionText,
-      }),
-    });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.data.transactions || [];
+    return response.data.data.transactions || [];
   } catch (error) {
     console.error('Error parsing transactions:', error);
     throw error;
   }
 };
 
-function AddExpenseForm({ addTransaction, refreshTransactions }: AddExpenseFormProps) {
+function AddExpenseForm({
+  addTransaction,
+  refreshTransactions,
+}: AddExpenseFormProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -57,7 +60,9 @@ function AddExpenseForm({ addTransaction, refreshTransactions }: AddExpenseFormP
       await refreshTransactions();
       form.resetFields();
       setLoading(false);
-      messageApi.success(`Successfully parsed ${parsedTransactions.length} transaction(s)!`);
+      messageApi.success(
+        `Successfully parsed ${parsedTransactions.length} transaction(s)!`
+      );
     } catch (error) {
       console.error('Error parsing transactions:', error);
       messageApi.error('Failed to parse transactions. Please try again.');
@@ -69,7 +74,13 @@ function AddExpenseForm({ addTransaction, refreshTransactions }: AddExpenseFormP
   return (
     <Card title="Add Expense">
       {contextHolder}
-      <Form name="addExpenseForm" autoComplete="off" onFinish={handleFinish} form={form} disabled={loading}>
+      <Form
+        name="addExpenseForm"
+        autoComplete="off"
+        onFinish={handleFinish}
+        form={form}
+        disabled={loading}
+      >
         <Form.Item
           name="transactionText"
           rules={[{ required: true, message: validationMessage }]}

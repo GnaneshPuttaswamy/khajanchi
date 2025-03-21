@@ -1,4 +1,5 @@
 import winston from 'winston';
+import { requestContextStorage } from '../contexts/contexts.js';
 
 interface LoggerConfig {
   logLevel?: string;
@@ -7,6 +8,16 @@ interface LoggerConfig {
 }
 
 type LogLevel = 'error' | 'warn' | 'info' | 'http' | 'verbose' | 'debug' | 'silly';
+
+const requestIdFormat = winston.format((info) => {
+  const requestId = requestContextStorage.getStore()?.requestId;
+
+  if (requestId) {
+    info.requestId = requestId;
+  }
+
+  return info;
+});
 
 export class Logger {
   private static instance: winston.Logger;
@@ -34,8 +45,10 @@ export class Logger {
       });
 
       Logger.instance = winston.createLogger({
+        levels: winston.config.npm.levels,
         level: logLevel,
         format: winston.format.combine(
+          requestIdFormat(),
           winston.format.timestamp(),
           winston.format.json(),
           winston.format.errors({ stack: true }),
@@ -54,7 +67,7 @@ export class Logger {
 }
 
 export const logger = Logger.getInstance({
-  logLevel: process.env.LOG_LEVEL || 'info',
+  logLevel: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
   nodeEnv: process.env.NODE_ENV || 'development',
   logFilePath: process.env.LOG_FILE_PATH || 'error.log',
 });

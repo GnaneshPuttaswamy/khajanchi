@@ -9,6 +9,7 @@ import {
 } from './types.js';
 import DateUtil from '../../../core/dateUtil/DateUtil.js';
 import { idParamsSchema } from '../../../core/zodSchemas/zodSchemas.js';
+import { logger } from '../../../core/logger/logger.js';
 
 export class UpdateTransactionUseCase extends BaseUseCase<
   UpdateTransactionParams,
@@ -37,20 +38,25 @@ export class UpdateTransactionUseCase extends BaseUseCase<
   }
 
   async execute() {
-    const user: any = await this.authenticate();
+    try {
+      const user: any = await this.authenticate();
 
-    await this.transactionRepository.model().update(
-      {
-        ...this.request.body,
-        userId: user.id,
-      },
-      {
-        where: {
-          id: this.request.params.id,
+      await this.transactionRepository.model().update(
+        {
+          ...this.request.body,
           userId: user.id,
         },
-      }
-    );
+        {
+          where: {
+            id: this.request.params.id,
+            userId: user.id,
+          },
+        }
+      );
+    } catch (error) {
+      logger.error('UpdateTransactionUseCase.execute() error', error);
+      throw error;
+    }
   }
 
   static create(request: Request<UpdateTransactionParams, {}, AddTransactionRequest, {}>, response: Response) {

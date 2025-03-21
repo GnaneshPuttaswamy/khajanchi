@@ -3,6 +3,7 @@ import { TransactionRepository } from '../../../repositories/TransactionReposito
 import { BaseUseCase } from '../../BaseUseCase.js';
 import { GetTransactionData, GetTransactionParams } from './types.js';
 import { idParamsSchema } from '../../../core/zodSchemas/zodSchemas.js';
+import { logger } from '../../../core/logger/logger.js';
 
 export class GetTransactionUseCase extends BaseUseCase<GetTransactionParams, {}, {}, {}, GetTransactionData> {
   transactionRepository: TransactionRepository;
@@ -21,16 +22,21 @@ export class GetTransactionUseCase extends BaseUseCase<GetTransactionParams, {},
   }
 
   async execute() {
-    const user: any = await this.authenticate();
+    try {
+      const user: any = await this.authenticate();
 
-    const transaction = await this.transactionRepository.model().findOne({
-      where: {
-        id: this.request.params.id,
-        userId: user.id,
-      },
-    });
+      const transaction = await this.transactionRepository.model().findOne({
+        where: {
+          id: this.request.params.id,
+          userId: user.id,
+        },
+      });
 
-    return transaction as unknown as GetTransactionData;
+      return transaction as unknown as GetTransactionData;
+    } catch (error) {
+      logger.error('GetTransactionUseCase.execute() error', error);
+      throw error;
+    }
   }
 
   static create(request: Request<GetTransactionParams, {}, {}, {}>, response: Response) {

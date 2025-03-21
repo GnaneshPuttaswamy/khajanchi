@@ -9,6 +9,7 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [messageApi, messageContextHolder] = message.useMessage();
+  const authToken = localStorage.getItem('authToken');
 
   const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -17,7 +18,12 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `${baseUrl}/transactions?isConfirmed=${isConfirmed}`
+          `${baseUrl}/transactions?isConfirmed=${isConfirmed}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
         );
         setTransactions(response.data.data || []);
       } catch (error) {
@@ -30,7 +36,7 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
     };
 
     fetchTransactions();
-  }, [baseUrl, isConfirmed]);
+  }, [baseUrl, isConfirmed, authToken]);
 
   useEffect(() => {
     if (err) {
@@ -45,17 +51,30 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
 
   const refreshTransactions = async () => {
     const response = await axios.get(
-      `${baseUrl}/transactions?isConfirmed=false`
+      `${baseUrl}/transactions?isConfirmed=false`,
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
     );
     setTransactions(response.data.data || []);
   };
 
   const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
-    await axios.post(`${baseUrl}/transactions`, transaction);
+    await axios.post(`${baseUrl}/transactions`, transaction, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
   };
 
   const deleteTransaction = async (id: React.Key) => {
-    await axios.delete(`${baseUrl}/transactions/${id}`);
+    await axios.delete(`${baseUrl}/transactions/${id}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
     await refreshTransactions();
   };
 
@@ -79,7 +98,11 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
     // Remove id as it's part of the URL
     const { id: _, ...transactionWithoutId } = fullUpdatedTransaction;
 
-    await axios.put(`${baseUrl}/transactions/${id}`, transactionWithoutId);
+    await axios.put(`${baseUrl}/transactions/${id}`, transactionWithoutId, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
 
     // Update local state
     setTransactions((prev) =>

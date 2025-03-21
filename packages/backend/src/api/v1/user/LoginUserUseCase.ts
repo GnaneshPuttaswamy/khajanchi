@@ -5,6 +5,7 @@ import { userLoginRequestSchema, UserLoginData, UserLoginRequest } from './types
 import { UserRepository } from '../../../repositories/UserRepository.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { logger } from '../../../core/logger/logger.js';
 
 export class LoginUserUseCase extends BaseUseCase<{}, {}, UserLoginRequest, {}, UserLoginData> {
   userRepository: UserRepository;
@@ -29,12 +30,12 @@ export class LoginUserUseCase extends BaseUseCase<{}, {}, UserLoginRequest, {}, 
     try {
       const user = await this.userRepository.findByEmail(this.request.body.email);
       if (!user) {
-        throw new Error("User dosen't exist. Please Sign Up!!");
+        throw new Error("User doesn't exist. Please sign up");
       }
 
       const isMatch = await bcrypt.compare(this.request.body.password, user.dataValues.password);
       if (!isMatch) {
-        throw new Error('Invalid Credentails');
+        throw new Error('Invalid credentials');
       }
 
       const token = jwt.sign(
@@ -49,6 +50,7 @@ export class LoginUserUseCase extends BaseUseCase<{}, {}, UserLoginRequest, {}, 
         token,
       };
     } catch (error) {
+      logger.error('LoginUserUseCase.execute() error', error);
       throw error;
     }
   }
