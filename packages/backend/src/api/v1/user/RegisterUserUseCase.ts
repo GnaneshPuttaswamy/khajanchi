@@ -5,6 +5,7 @@ import { UserRegisterData, UserRegisterRequest, userRegisterRequestSchema } from
 import { UserRepository } from '../../../repositories/UserRepository.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { logger } from '../../../core/logger/logger.js';
 
 export class RegisterUserUseCase extends BaseUseCase<{}, {}, UserRegisterRequest, {}, UserRegisterData> {
   userRepository: UserRepository;
@@ -29,8 +30,9 @@ export class RegisterUserUseCase extends BaseUseCase<{}, {}, UserRegisterRequest
     let user;
     try {
       user = await this.userRepository.findByEmail(this.request.body.email);
+
       if (user) {
-        throw new Error('User already exists. Please login!!');
+        throw new Error('User already exists. Please login');
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -53,6 +55,7 @@ export class RegisterUserUseCase extends BaseUseCase<{}, {}, UserRegisterRequest
         token,
       };
     } catch (error) {
+      logger.error('RegisterUserUseCase.execute() error', error);
       throw error;
     }
   }

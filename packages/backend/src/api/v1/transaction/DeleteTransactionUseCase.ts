@@ -3,6 +3,7 @@ import { TransactionRepository } from '../../../repositories/TransactionReposito
 import { BaseUseCase } from '../../BaseUseCase.js';
 import { DeleteTransactionData, DeleteTransactionParams } from './types.js';
 import { idParamsSchema } from '../../../core/zodSchemas/zodSchemas.js';
+import { logger } from '../../../core/logger/logger.js';
 
 export class DeleteTransactionUseCase extends BaseUseCase<DeleteTransactionParams, {}, {}, {}, DeleteTransactionData> {
   transactionRepository: TransactionRepository;
@@ -21,22 +22,27 @@ export class DeleteTransactionUseCase extends BaseUseCase<DeleteTransactionParam
   }
 
   async execute() {
-    const user: any = await this.authenticate();
+    try {
+      const user: any = await this.authenticate();
 
-    const deleteCount = await this.transactionRepository.model().destroy({
-      where: {
-        id: this.request.params.id,
-        userId: user.id,
-      },
-    });
+      const deleteCount = await this.transactionRepository.model().destroy({
+        where: {
+          id: this.request.params.id,
+          userId: user.id,
+        },
+      });
 
-    if (deleteCount === 0) {
-      throw new Error('Transaction not found');
+      if (deleteCount === 0) {
+        throw new Error('Transaction not found');
+      }
+
+      return {
+        deletedCount: deleteCount,
+      };
+    } catch (error) {
+      logger.error('DeleteTransactionUseCase.execute() error', error);
+      throw error;
     }
-
-    return {
-      deletedCount: deleteCount,
-    };
   }
 
   static create(request: Request<DeleteTransactionParams, {}, {}, {}>, response: Response) {

@@ -26,6 +26,7 @@ export default {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || '3306'),
     dialect: process.env.DB_DIALECT || 'mysql',
+    seederStorage: 'sequelize',
     dialectOptions: {
       bigNumberStrings: true,
     },

@@ -1,4 +1,5 @@
 import { Dialect, Sequelize } from 'sequelize';
+import { logger } from '../logger/logger.js';
 
 class Database {
   private static instance: Database;
@@ -8,7 +9,7 @@ class Database {
     this.sequelize = new Sequelize(process.env.DB_DATABASE!, process.env.DB_USERNAME!, process.env.DB_PASSWORD!, {
       host: process.env.DB_HOST!,
       dialect: process.env.DB_DIALECT! as Dialect,
-      logging: process.env.NODE_ENV === 'development',
+      logging: process.env.NODE_ENV === 'development' ? logger.debug.bind(logger) : false,
       define: {
         timestamps: true,
         paranoid: false,
@@ -26,6 +27,7 @@ class Database {
   public static getInstance(): Database {
     if (!Database.instance) {
       Database.instance = new Database();
+      logger.info('Database connection initialized');
     }
     return Database.instance;
   }
