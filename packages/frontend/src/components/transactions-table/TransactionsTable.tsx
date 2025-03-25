@@ -1,9 +1,29 @@
-import { Flex, Form, message, Pagination, Space, Table, TableProps, Tag } from 'antd';
+import {
+  Flex,
+  Form,
+  message,
+  Pagination,
+  Space,
+  Table,
+  TableProps,
+  Tag,
+  Tooltip,
+} from 'antd';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Transaction } from '../../types/types';
-import { ACTION_COLUMN_FIELDS, TRANSACTION_COLUMN_FIELDS } from '../../constants/TransactionTableConstants';
+import {
+  ACTION_COLUMN_FIELDS,
+  TRANSACTION_COLUMN_FIELDS,
+} from '../../constants/TransactionTableConstants';
 import dayjs from 'dayjs';
-import { CancelButton, ConfirmButton, DeleteButton, EditButton, SaveButton } from './TransactionActionButtons';
+import utc from 'dayjs/plugin/utc';
+import {
+  CancelButton,
+  ConfirmButton,
+  DeleteButton,
+  EditButton,
+  SaveButton,
+} from './TransactionActionButtons';
 import EditableCell from './EditableCell';
 import {
   TransactionsTableActionType,
@@ -23,13 +43,21 @@ const categoryColors: Record<string, string> = {
   education: 'cyan',
 };
 
+dayjs.extend(utc);
+
 const baseColumns: TableProps<Transaction>['columns'] = [
   {
     title: 'Date',
     dataIndex: TRANSACTION_COLUMN_FIELDS.DATE,
     width: '15%',
     minWidth: 120,
-    render: (text: string) => dayjs(text).format('Do, MMM YYYY'),
+    render: (text: string) => (
+      <Tooltip
+        title={`${dayjs.utc(text).local().format('YYYY-MM-DD HH:mm:ss')}`}
+      >
+        {dayjs.utc(text).local().format('Do, MMM YYYY')}
+      </Tooltip>
+    ),
   },
   {
     title: 'Amount',
@@ -58,7 +86,11 @@ interface MyTableProps {
   transactions: Transaction[];
   isConfirmedTransactions: boolean;
   deleteTransaction: (id: React.Key) => Promise<void>;
-  updateTransaction: (id: React.Key, updatedTransaction: Partial<Omit<Transaction, 'id'>>) => Promise<void>;
+  updateTransaction: (
+    id: React.Key,
+    updatedTransaction: Partial<Omit<Transaction, 'id'>>
+  ) => Promise<void>;
+  refreshTransactions: (isConfirmed: boolean) => void;
 }
 
 const initialState: TransactionsTableState = {
@@ -73,6 +105,7 @@ function TransactionsTable({
   transactions,
   isConfirmedTransactions,
   deleteTransaction,
+  refreshTransactions,
   updateTransaction,
 }: MyTableProps) {
   const { isCompact } = useContext(CompactModeContext);
@@ -91,9 +124,17 @@ function TransactionsTable({
     }
   }, [err, messageApi]);
 
-  const [transactionsTableState, dispatch] = useReducer(transactionsTableReducer, initialState);
-  const { currentlyEditingId, isFormDisabled, confirmingTransactionIds, deletingTransactionIds, savingTransactionIds } =
-    transactionsTableState;
+  const [transactionsTableState, dispatch] = useReducer(
+    transactionsTableReducer,
+    initialState
+  );
+  const {
+    currentlyEditingId,
+    isFormDisabled,
+    confirmingTransactionIds,
+    deletingTransactionIds,
+    savingTransactionIds,
+  } = transactionsTableState;
 
   // Manages the confirmation process for transactions.
   // 1. Resets the editing state if the transaction is being edited.
@@ -107,17 +148,27 @@ function TransactionsTable({
       }
 
       // setConfirmingTransactionIds((prev) => [...prev, transactionId]);
-      dispatch({ type: TransactionsTableActionType.ADD_CONFIRMING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.ADD_CONFIRMING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
 
       await updateTransaction(transactionId, { isConfirmed: true });
+      await refreshTransactions(false);
     } catch (error) {
       console.log('Error while deleting transaction => ', error);
       // setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
-      dispatch({ type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
       setErr('Error while deleting transaction');
     } finally {
       // setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
-      dispatch({ type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
     }
   };
 
@@ -132,7 +183,10 @@ function TransactionsTable({
       [TRANSACTION_COLUMN_FIELDS.DESCRIPTION]: transactionToEdit.description,
     });
 
-    dispatch({ type: TransactionsTableActionType.SET_EDITING_ID, payload: { id: transactionToEdit.id } });
+    dispatch({
+      type: TransactionsTableActionType.SET_EDITING_ID,
+      payload: { id: transactionToEdit.id },
+    });
   };
 
   // Deletes a transaction.
@@ -141,14 +195,24 @@ function TransactionsTable({
   // 3. Removes the transaction ID from the deleting list, regardless of success or failure.
   const onDelete = async (transactionId: React.Key) => {
     try {
-      dispatch({ type: TransactionsTableActionType.ADD_DELETING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.ADD_DELETING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
       await deleteTransaction(transactionId);
+      await refreshTransactions(isConfirmedTransactions);
     } catch (error) {
       console.log('Error while deleting transaction => ', error);
-      dispatch({ type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
       setErr('Error while deleting transaction');
     } finally {
-      dispatch({ type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
     }
   };
 
@@ -168,17 +232,36 @@ function TransactionsTable({
   // 7. Resets the current editing state.
   const onSave = async (transactionId: React.Key) => {
     try {
-      dispatch({ type: TransactionsTableActionType.ADD_SAVING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.ADD_SAVING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
       dispatch({ type: TransactionsTableActionType.SET_FORM_DISABLED });
-      const newValues = await form.validateFields();
+      const formValues = await form.validateFields();
+
+      // Convert dayjs object to ISO string for API
+      const newValues = {
+        ...formValues,
+        [TRANSACTION_COLUMN_FIELDS.DATE]: formValues[
+          TRANSACTION_COLUMN_FIELDS.DATE
+        ]
+          ? dayjs(formValues[TRANSACTION_COLUMN_FIELDS.DATE]).utc().format()
+          : undefined,
+      };
       await updateTransaction(transactionId, newValues);
       form.resetFields();
       dispatch({ type: TransactionsTableActionType.CLEAR_EDITING_ID });
     } catch (error) {
-      console.log(`Error while saving the record with id=${transactionId}`, error);
+      console.log(
+        `Error while saving the record with id=${transactionId}`,
+        error
+      );
       setErr('Error while saving the record');
     } finally {
-      dispatch({ type: TransactionsTableActionType.REMOVE_SAVING_TRANSACTION_ID, payload: { id: transactionId } });
+      dispatch({
+        type: TransactionsTableActionType.REMOVE_SAVING_TRANSACTION_ID,
+        payload: { id: transactionId },
+      });
       dispatch({ type: TransactionsTableActionType.CLEAR_FORM_DISABLED });
     }
   };
@@ -209,8 +292,16 @@ function TransactionsTable({
 
       return isEditing ? (
         <Space>
-          <SaveButton transactionId={record.id} savingTransactionIds={savingTransactionIds} onSave={onSave} />
-          <CancelButton transactionId={record.id} savingTransactionIds={savingTransactionIds} onCancel={onCancel} />
+          <SaveButton
+            transactionId={record.id}
+            savingTransactionIds={savingTransactionIds}
+            onSave={onSave}
+          />
+          <CancelButton
+            transactionId={record.id}
+            savingTransactionIds={savingTransactionIds}
+            onCancel={onCancel}
+          />
         </Space>
       ) : (
         <Space size={10}>
@@ -258,26 +349,31 @@ function TransactionsTable({
   }
 
   // Transforming the columns to include additional props in each cell
-  const mergedColumns: TableProps<Transaction>['columns'] = columns!.map((col) => {
-    if (!('dataIndex' in col)) {
+  const mergedColumns: TableProps<Transaction>['columns'] = columns!.map(
+    (col) => {
+      if (!('dataIndex' in col)) {
+        return col;
+      }
+
+      if (
+        col.dataIndex !== ACTION_COLUMN_FIELDS.CONFIRMATION &&
+        col.dataIndex !== ACTION_COLUMN_FIELDS.MODIFY
+      ) {
+        return {
+          ...col,
+          onCell: (record: Transaction) => ({
+            editing: currentlyEditingId === record.id, // To change the editing state of the cell
+            dataIndex: col.dataIndex, // To select the input type
+            title: col.title, // To display the title of the cell in error message
+            // isMobile: false, // To check if the device is mobile and then make the input read only for date picker
+            disabled: isFormDisabled,
+          }),
+        } as typeof col;
+      }
+
       return col;
     }
-
-    if (col.dataIndex !== ACTION_COLUMN_FIELDS.CONFIRMATION && col.dataIndex !== ACTION_COLUMN_FIELDS.MODIFY) {
-      return {
-        ...col,
-        onCell: (record: Transaction) => ({
-          editing: currentlyEditingId === record.id, // To change the editing state of the cell
-          dataIndex: col.dataIndex, // To select the input type
-          title: col.title, // To display the title of the cell in error message
-          // isMobile: false, // To check if the device is mobile and then make the input read only for date picker
-          disabled: isFormDisabled,
-        }),
-      } as typeof col;
-    }
-
-    return col;
-  });
+  );
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(20);

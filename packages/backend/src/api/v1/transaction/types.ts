@@ -2,7 +2,7 @@ import { z } from 'zod';
 import DateUtil from '../../../core/dateUtil/DateUtil.js';
 import { IdParams } from '../../../core/zodSchemas/zodSchemas.js';
 
-const dateUtil = new DateUtil();
+const dateUtil = DateUtil.getInstance();
 
 // AddTransactionUseCase
 export const addTransactionRequestSchema = z.object({

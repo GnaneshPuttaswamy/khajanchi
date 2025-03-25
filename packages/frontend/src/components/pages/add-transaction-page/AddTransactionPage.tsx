@@ -38,6 +38,7 @@ function AddTransactionPage() {
           isConfirmedTransactions={false}
           deleteTransaction={deleteTransaction}
           updateTransaction={updateTransaction}
+          refreshTransactions={refreshTransactions}
         />
       </Card>
     </>

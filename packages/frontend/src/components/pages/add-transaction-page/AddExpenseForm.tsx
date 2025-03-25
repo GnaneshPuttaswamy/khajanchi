@@ -12,7 +12,7 @@ const validationMessage = 'Please enter your transaction details';
 
 interface AddExpenseFormProps {
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
-  refreshTransactions: () => void;
+  refreshTransactions: (isConfirmed: boolean) => void;
 }
 
 const parseTransactionText = async (
@@ -57,7 +57,7 @@ function AddExpenseForm({
         await addTransaction(transaction);
       }
 
-      await refreshTransactions();
+      await refreshTransactions(false);
       form.resetFields();
       setLoading(false);
       messageApi.success(

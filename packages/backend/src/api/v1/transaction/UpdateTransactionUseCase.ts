@@ -7,7 +7,6 @@ import {
   UpdateTransactionRequest,
   updateTransactionRequestSchema,
 } from './types.js';
-import DateUtil from '../../../core/dateUtil/DateUtil.js';
 import { idParamsSchema } from '../../../core/zodSchemas/zodSchemas.js';
 import { logger } from '../../../core/logger/logger.js';
 
@@ -19,17 +18,14 @@ export class UpdateTransactionUseCase extends BaseUseCase<
   void
 > {
   transactionRepository: TransactionRepository;
-  dateUtil: DateUtil;
 
   constructor(
     request: Request<UpdateTransactionParams, {}, UpdateTransactionRequest, {}>,
     response: Response,
-    transactionRepository: TransactionRepository,
-    dateUtil: DateUtil
+    transactionRepository: TransactionRepository
   ) {
     super(request, response);
     this.transactionRepository = transactionRepository;
-    this.dateUtil = dateUtil;
   }
 
   async validate() {
@@ -54,12 +50,12 @@ export class UpdateTransactionUseCase extends BaseUseCase<
         }
       );
     } catch (error) {
-      logger.error('UpdateTransactionUseCase.execute() error', error);
+      logger.error('UpdateTransactionUseCase.execute() :: error', error);
       throw error;
     }
   }
 
   static create(request: Request<UpdateTransactionParams, {}, AddTransactionRequest, {}>, response: Response) {
-    return new UpdateTransactionUseCase(request, response, new TransactionRepository(), new DateUtil());
+    return new UpdateTransactionUseCase(request, response, new TransactionRepository());
   }
 }

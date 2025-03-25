@@ -6,7 +6,7 @@ import DateUtil from '../../core/dateUtil/DateUtil.js';
 export default {
   async up(queryInterface: QueryInterface, Sequelize: Sequelize) {
     let dbTransaction: Transaction;
-    const dateUtil = new DateUtil();
+    const dateUtil = DateUtil.getInstance();
 
     try {
       dbTransaction = await queryInterface.sequelize.transaction();

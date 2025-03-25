@@ -28,7 +28,7 @@
   },
   "keywords": [],
   "author": "Gnanesh Puttaswamy",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/bcryptjs": "^3.0.0",

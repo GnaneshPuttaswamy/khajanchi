@@ -34,7 +34,7 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
 
       return transactions as unknown as GetAllTransactionsData[];
     } catch (error) {
-      logger.error('GetAllTransactionsUseCase.execute() error', error);
+      logger.error('GetAllTransactionsUseCase.execute() :: error', error);
       throw error;
     }
   }

@@ -40,7 +40,7 @@ export class DeleteTransactionUseCase extends BaseUseCase<DeleteTransactionParam
         deletedCount: deleteCount,
       };
     } catch (error) {
-      logger.error('DeleteTransactionUseCase.execute() error', error);
+      logger.error('DeleteTransactionUseCase.execute() :: error', error);
       throw error;
     }
   }

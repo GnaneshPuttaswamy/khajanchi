@@ -1,4 +1,15 @@
 class DateUtil {
+  private static instance: DateUtil;
+
+  private constructor() {}
+
+  public static getInstance(): DateUtil {
+    if (!DateUtil.instance) {
+      DateUtil.instance = new DateUtil();
+    }
+    return DateUtil.instance;
+  }
+
   validateDate(date: Date | string): void {
     if (date === null || date === undefined) {
       throw new Error('Date input cannot be null or undefined');
