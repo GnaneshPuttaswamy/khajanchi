@@ -9,7 +9,13 @@ class Database {
     this.sequelize = new Sequelize(process.env.DB_DATABASE!, process.env.DB_USERNAME!, process.env.DB_PASSWORD!, {
       host: process.env.DB_HOST!,
       dialect: process.env.DB_DIALECT! as Dialect,
-      logging: process.env.NODE_ENV === 'development' ? logger.debug.bind(logger) : false,
+      logging:
+        process.env.NODE_ENV === 'development'
+          ? (sql: string, timing?: number) => {
+              // This preserves the async context when Sequelize calls the logging function
+              logger.debug(sql, timing);
+            }
+          : false,
       define: {
         timestamps: true,
         paranoid: false,

@@ -13,6 +13,7 @@ function AllTransactionsPage() {
     messageContextHolder,
     deleteTransaction,
     updateTransaction,
+    refreshTransactions,
   } = useTransactions({
     isConfirmed: true,
   });
@@ -42,6 +43,7 @@ function AllTransactionsPage() {
           transactions={transactions}
           isConfirmedTransactions={true}
           deleteTransaction={deleteTransaction}
+          refreshTransactions={refreshTransactions}
           updateTransaction={updateTransaction}
         />
       </Card>

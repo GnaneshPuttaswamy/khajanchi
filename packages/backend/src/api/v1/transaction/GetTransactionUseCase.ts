@@ -34,7 +34,7 @@ export class GetTransactionUseCase extends BaseUseCase<GetTransactionParams, {},
 
       return transaction as unknown as GetTransactionData;
     } catch (error) {
-      logger.error('GetTransactionUseCase.execute() error', error);
+      logger.error('GetTransactionUseCase.execute() :: error', error);
       throw error;
     }
   }

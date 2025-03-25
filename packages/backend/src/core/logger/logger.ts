@@ -67,7 +67,7 @@ export class Logger {
 }
 
 export const logger = Logger.getInstance({
-  logLevel: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  logLevel: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
   nodeEnv: process.env.NODE_ENV || 'development',
-  logFilePath: process.env.LOG_FILE_PATH || 'error.log',
+  logFilePath: process.env.LOG_FILE_PATH || 'logs/app.log',
 });

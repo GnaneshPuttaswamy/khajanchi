@@ -18,7 +18,13 @@ services:
       - JWT_SECRET=${JWT_SECRET}
     volumes:
       - khajanchi-api-node_modules:/usr/app/packages/backend/node_modules
-      - .:/usr/app/packages/backend
+      # - .:/usr/app/packages/backend
+      - ./src:/usr/app/packages/backend/src
+      - ./.env:/usr/app/packages/backend/.env
+      - ./.sequelizerc:/usr/app/packages/backend/.sequelizerc
+      - ./package.json:/usr/app/packages/backend/package.json
+      - ./tsconfig.json:/usr/app/packages/backend/tsconfig.json
+      - ./logs:/usr/app/packages/backend/logs
     ports:
       - "9000:3000"
     working_dir: /usr/app/packages/backend

@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "Gnanesh Puttaswamy",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.5.2",
   "dependencies": {
     "uuid": "^11.1.0"

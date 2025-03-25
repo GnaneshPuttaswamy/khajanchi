@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { BaseUseCase } from '../../BaseUseCase.js';
-import DateUtil from '../../../core/dateUtil/DateUtil.js';
 import { UserRegisterData, UserRegisterRequest, userRegisterRequestSchema } from './types.js';
 import { UserRepository } from '../../../repositories/UserRepository.js';
 import bcrypt from 'bcryptjs';
@@ -9,17 +8,10 @@ import { logger } from '../../../core/logger/logger.js';
 
 export class RegisterUserUseCase extends BaseUseCase<{}, {}, UserRegisterRequest, {}, UserRegisterData> {
   userRepository: UserRepository;
-  dateUtil: DateUtil;
 
-  constructor(
-    request: Request<{}, {}, UserRegisterRequest, {}>,
-    response: Response,
-    userRepository: UserRepository,
-    dateUtil: DateUtil
-  ) {
+  constructor(request: Request<{}, {}, UserRegisterRequest, {}>, response: Response, userRepository: UserRepository) {
     super(request, response);
     this.userRepository = userRepository;
-    this.dateUtil = dateUtil;
   }
 
   async validate() {
@@ -55,12 +47,12 @@ export class RegisterUserUseCase extends BaseUseCase<{}, {}, UserRegisterRequest
         token,
       };
     } catch (error) {
-      logger.error('RegisterUserUseCase.execute() error', error);
+      logger.error('RegisterUserUseCase.execute() :: error', error);
       throw error;
     }
   }
 
   static create(request: Request<{}, {}, UserRegisterRequest, {}>, response: Response) {
-    return new RegisterUserUseCase(request, response, new UserRepository(), new DateUtil());
+    return new RegisterUserUseCase(request, response, new UserRepository());
   }
 }

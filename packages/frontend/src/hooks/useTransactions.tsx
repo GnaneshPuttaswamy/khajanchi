@@ -49,9 +49,9 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
     }
   }, [err, messageApi]);
 
-  const refreshTransactions = async () => {
+  const refreshTransactions = async (isConfirmed: boolean) => {
     const response = await axios.get(
-      `${baseUrl}/transactions?isConfirmed=false`,
+      `${baseUrl}/transactions?isConfirmed=${isConfirmed}`,
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -75,7 +75,6 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
         Authorization: `Bearer ${authToken}`,
       },
     });
-    await refreshTransactions();
   };
 
   const updateTransaction = async (
@@ -110,8 +109,6 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
         transaction.id === id ? { ...fullUpdatedTransaction } : transaction
       )
     );
-
-    await refreshTransactions();
   };
 
   return {

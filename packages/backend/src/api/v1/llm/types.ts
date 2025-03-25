@@ -7,7 +7,9 @@ export interface ParseTransactionsRequest {
 export const TransactionSchema = z.object({
   date: z
     .string()
-    .describe("Date of transaction in ISO 8601 format (e.g., 2021-09-01) if specified else today's date."),
+    .describe(
+      'Date and time of transaction in ISO 8601 format (e.g., 2021-09-01T14:30:00Z) if specified else current date and time.'
+    ),
   amount: z.number().describe('Amount of the item'),
   category: z.string().describe('One word category of the expense (e.g., food, travel, entertainment)'),
   description: z.string().describe('Concise and short description of the item'),

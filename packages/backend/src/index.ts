@@ -29,7 +29,7 @@ app.get(`${API_V1}/healthcheck`, (_req: Request, res: Response) => {
 
   res.status(200).json({
     status: 'ok',
-    timestamp: new DateUtil().toISOString(new Date()),
+    timestamp: DateUtil.getInstance().toISOString(new Date()),
     version: 'v1',
     service: 'khajanchi-backend',
   });
