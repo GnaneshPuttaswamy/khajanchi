@@ -12,6 +12,7 @@ import {
   Typography,
   Space,
   Steps,
+  Card,
 } from 'antd';
 import rupee from '../../../../public/rupee.svg';
 import { Link } from 'react-router';
@@ -113,11 +114,7 @@ const ForgotPassword: React.FC = () => {
                 },
               ]}
             >
-              <Input
-                size="large"
-                prefix={<MailOutlined />}
-                placeholder="Email"
-              />
+              <Input prefix={<MailOutlined />} placeholder="Email" />
             </Form.Item>
 
             <Form.Item>
@@ -126,7 +123,6 @@ const ForgotPassword: React.FC = () => {
                 block
                 type="primary"
                 htmlType="submit"
-                size="large"
               >
                 Send Reset Code
               </Button>
@@ -161,7 +157,6 @@ const ForgotPassword: React.FC = () => {
               ]}
             >
               <Input
-                size="large"
                 prefix={<KeyOutlined />}
                 placeholder="Verification Code"
                 maxLength={6}
@@ -174,7 +169,6 @@ const ForgotPassword: React.FC = () => {
                 block
                 type="primary"
                 htmlType="submit"
-                size="large"
               >
                 Verify Code
               </Button>
@@ -215,7 +209,6 @@ const ForgotPassword: React.FC = () => {
               ]}
             >
               <Input.Password
-                size="large"
                 prefix={<LockOutlined />}
                 placeholder="New Password"
                 visibilityToggle={true}
@@ -243,7 +236,6 @@ const ForgotPassword: React.FC = () => {
               ]}
             >
               <Input.Password
-                size="large"
                 prefix={<LockOutlined />}
                 placeholder="Confirm New Password"
                 visibilityToggle={true}
@@ -256,7 +248,6 @@ const ForgotPassword: React.FC = () => {
                 block
                 type="primary"
                 htmlType="submit"
-                size="large"
               >
                 Reset Password
               </Button>
@@ -270,13 +261,7 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <Layout
-      style={{
-        height: '100%',
-        width: '100%',
-        background: '#f5f5f5',
-      }}
-    >
+    <Layout style={{ height: '100%', width: '100%' }}>
       <Flex
         style={{
           height: '100%',
@@ -288,12 +273,7 @@ const ForgotPassword: React.FC = () => {
         vertical
       >
         {messageContextHolder}
-        <Space
-          direction="vertical"
-          size="large"
-          align="center"
-          style={{ marginBottom: 24 }}
-        >
+        <Space direction="vertical" align="center" style={{ marginBottom: 24 }}>
           <Image
             style={{
               width: 80,
@@ -310,16 +290,7 @@ const ForgotPassword: React.FC = () => {
           </Typography.Text>
         </Space>
 
-        <div
-          style={{
-            minWidth: 360,
-            maxWidth: 360,
-            background: 'white',
-            padding: '24px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          }}
-        >
+        <Card style={{ minWidth: 360, maxWidth: 360 }}>
           <Steps
             current={currentStep}
             size="small"
@@ -349,7 +320,7 @@ const ForgotPassword: React.FC = () => {
               <Link to="/signin">Sign In</Link>
             </Button>
           </Flex>
-        </div>
+        </Card>
       </Flex>
     </Layout>
   );

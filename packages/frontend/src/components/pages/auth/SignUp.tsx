@@ -11,10 +11,11 @@ import {
   Divider,
   Typography,
   Space,
+  Card,
 } from 'antd';
 import { AuthContext } from '../../../context/AuthContext';
 import rupee from '../../../../public/rupee.svg';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 const SignUp: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +23,11 @@ const SignUp: React.FC = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
 
   const { signup } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get the redirect path from location state, or default to '/'
+  const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
     if (err) {
@@ -37,24 +43,21 @@ const SignUp: React.FC = () => {
   const onFinish = async (values: any) => {
     try {
       setIsLoading(true);
+
       const { email, password } = values;
       await signup(email, password);
+
+      navigate(from, { replace: true });
     } catch (error) {
       console.log(error);
-      setErr('Unable to Sign Up!');
+      setErr('Unable to Sign Up!!');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Layout
-      style={{
-        height: '100%',
-        width: '100%',
-        background: '#f5f5f5',
-      }}
-    >
+    <Layout style={{ height: '100%', width: '100%' }}>
       <Flex
         style={{
           height: '100%',
@@ -66,12 +69,7 @@ const SignUp: React.FC = () => {
         vertical
       >
         {messageContextHolder}
-        <Space
-          direction="vertical"
-          size="large"
-          align="center"
-          style={{ marginBottom: 24 }}
-        >
+        <Space direction="vertical" align="center" style={{ marginBottom: 24 }}>
           <Image
             style={{
               width: 80,
@@ -88,90 +86,81 @@ const SignUp: React.FC = () => {
           </Typography.Text>
         </Space>
 
-        <Form
-          name="signup"
-          initialValues={{ remember: true }}
-          style={{
-            minWidth: 360,
-            maxWidth: 360,
-            background: 'white',
-            padding: '24px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          }}
-          onFinish={onFinish}
-          validateTrigger="onSubmit"
-        >
-          {/* <Form.Item
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your full name!',
-              },
-            ]}
+        <Card style={{ minWidth: 360, maxWidth: 360 }}>
+          <Form
+            name="signup"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            validateTrigger="onSubmit"
           >
-            <Input
-              size="large"
-              prefix={<UserOutlined />}
-              placeholder="Full Name"
-            />
-          </Form.Item> */}
-
-          <Form.Item
-            name="email"
-            rules={[
-              {
-                type: 'email',
-                required: true,
-                message: 'Please input a valid email address!',
-              },
-            ]}
-          >
-            <Input size="large" prefix={<MailOutlined />} placeholder="Email" />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your password!',
-              },
-            ]}
-          >
-            <Input.Password
-              size="large"
-              prefix={<LockOutlined />}
-              placeholder="Password"
-              visibilityToggle={true}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              loading={isLoading}
-              block
-              type="primary"
-              htmlType="submit"
-              size="large"
-              icon={<UserAddOutlined />}
+            {/* <Form.Item
+              name="name"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your full name!',
+                },
+              ]}
             >
-              Create Account
-            </Button>
-          </Form.Item>
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Full Name"
+              />
+            </Form.Item> */}
 
-          <Divider plain>Or</Divider>
+            <Form.Item
+              name="email"
+              rules={[
+                {
+                  type: 'email',
+                  required: true,
+                  message: 'Please input a valid email address!',
+                },
+              ]}
+            >
+              <Input prefix={<MailOutlined />} placeholder="Email" />
+            </Form.Item>
 
-          <Flex justify="center" align="center">
-            <Typography.Text type="secondary">
-              Already have an account?
-            </Typography.Text>
-            <Button type="link" style={{ padding: '0 8px' }}>
-              <Link to="/signin">Sign In</Link>
-            </Button>
-          </Flex>
-        </Form>
+            <Form.Item
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your password!',
+                },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+                visibilityToggle={true}
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                loading={isLoading}
+                block
+                type="primary"
+                htmlType="submit"
+                icon={<UserAddOutlined />}
+              >
+                Create Account
+              </Button>
+            </Form.Item>
+
+            <Divider plain>Or</Divider>
+
+            <Flex justify="center" align="center">
+              <Typography.Text type="secondary">
+                Already have an account?
+              </Typography.Text>
+              <Button type="link" style={{ padding: '0 8px' }}>
+                <Link to="/signin">Sign In</Link>
+              </Button>
+            </Flex>
+          </Form>
+        </Card>
       </Flex>
     </Layout>
   );
