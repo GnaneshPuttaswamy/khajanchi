@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React, { createContext, useState, useEffect } from 'react';
+import { axiosInstance } from '../utils/httpUtil';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -33,26 +33,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const signin = async (email: string, password: string) => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/users/login`,
-      {
-        email,
-        password,
-      }
-    );
+    const response = await axiosInstance.post('/users/login', {
+      email,
+      password,
+    });
 
     localStorage.setItem('authToken', response.data?.data?.token);
     setIsAuthenticated(true);
   };
 
   const signup = async (email: string, password: string) => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/users/register`,
-      {
-        email,
-        password,
-      }
-    );
+    const response = await axiosInstance.post('/users/register', {
+      email,
+      password,
+    });
 
     localStorage.setItem('authToken', response.data?.data?.token);
     setIsAuthenticated(true);
