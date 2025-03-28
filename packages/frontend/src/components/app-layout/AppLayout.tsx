@@ -1,19 +1,21 @@
 import { Flex } from 'antd';
 import { Layout, theme } from 'antd';
 import React, { useContext, useEffect } from 'react';
-import AllTransactionsPage from '../pages/all-transactions-page/AllTransactionsPage';
-import AddTransactionPage from '../pages/add-transaction-page/AddTransactionPage';
-import { Routes, Route, useNavigate, useLocation } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import SideMenu from './SideMenu';
 import ContentHeader from './content-header/ContentHeader';
 import { ThemeContext } from '../../context/ThemeContext';
 import { IsMobileContext } from '../../context/IsMobileContext';
 const { Content, Sider } = Layout;
 
-function AppLayout({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (collapsed: boolean) => void }) {
+function AppLayout({
+  collapsed,
+  setCollapsed,
+}: {
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}) {
   const { isMobile } = useContext(IsMobileContext);
-  // navigate hook for routing
-  const navigate = useNavigate();
   const location = useLocation();
   const { isDark } = useContext(ThemeContext);
   const {
@@ -33,18 +35,17 @@ function AppLayout({ collapsed, setCollapsed }: { collapsed: boolean; setCollaps
 
   useEffect(() => {
     // Update the HTML element's data-theme attribute
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.documentElement.setAttribute(
+      'data-theme',
+      isDark ? 'dark' : 'light'
+    );
 
     // Update the background color CSS variable
-    document.documentElement.style.setProperty('--background-color', isDark ? '#1C1D20' : '#f4f4f4');
+    document.documentElement.style.setProperty(
+      '--background-color',
+      isDark ? '#1C1D20' : '#f4f4f4'
+    );
   }, [isDark]);
-
-  // Redirect to /add-transaction if on root path
-  useEffect(() => {
-    if (location.pathname === '/') {
-      navigate('/add-transaction');
-    }
-  }, [location.pathname, navigate]);
 
   return (
     <Layout style={{ height: '100%' }}>
@@ -60,7 +61,7 @@ function AppLayout({ collapsed, setCollapsed }: { collapsed: boolean; setCollaps
             left: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             backdropFilter: 'blur(4px)',
-            zIndex: 998, // Below Sider but above content
+            zIndex: 998,
             transition: 'all 0.3s ease-in-out',
           }}
         />
@@ -100,7 +101,11 @@ function AppLayout({ collapsed, setCollapsed }: { collapsed: boolean; setCollaps
           }}
           className="content-container"
         >
-          <ContentHeader collapsed={collapsed} setCollapsed={setCollapsed} currentPath={location.pathname} />
+          <ContentHeader
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            currentPath={location.pathname}
+          />
           <Flex
             flex={1}
             style={{
@@ -109,12 +114,7 @@ function AppLayout({ collapsed, setCollapsed }: { collapsed: boolean; setCollaps
             vertical
             gap="middle"
           >
-            <Routes>
-              <Route path="/" element={<AddTransactionPage />} />
-              <Route path="/add-transaction" element={<AddTransactionPage />} />
-              <Route path="/transaction-history" element={<AllTransactionsPage />} />
-              <Route path="/settings" element={<div>To be implemented</div>} />
-            </Routes>
+            <Outlet />
           </Flex>
         </Content>
       </Layout>

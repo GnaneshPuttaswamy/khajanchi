@@ -3,6 +3,7 @@ import { axiosInstance } from '../utils/httpUtil';
 
 type AuthContextType = {
   isAuthenticated: boolean;
+  isLoading: boolean;
   signin: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   signout: () => void;
@@ -10,6 +11,7 @@ type AuthContextType = {
 
 export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
+  isLoading: true,
   signin: async () => {
     throw new Error('signin not implemented');
   },
@@ -24,12 +26,21 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem('authToken');
+  });
+
+  // useEffect(() => {
+  //   if (localStorage.getItem('authToken')) {
+  //     setIsAuthenticated(true);
+  //   }
+  // }, []);
 
   useEffect(() => {
-    if (localStorage.getItem('authToken')) {
-      setIsAuthenticated(true);
-    }
+    // Any additional auth validation could go here
+    // For example, checking if the token is valid/expired
+    setIsLoading(false);
   }, []);
 
   const signin = async (email: string, password: string) => {
@@ -58,7 +69,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, signin, signup, signout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isLoading, signin, signup, signout }}
+    >
       {children}
     </AuthContext.Provider>
   );

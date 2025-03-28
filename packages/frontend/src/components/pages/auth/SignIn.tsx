@@ -11,17 +11,23 @@ import {
   Divider,
   Typography,
   Space,
+  Card,
 } from 'antd';
 import { AuthContext } from '../../../context/AuthContext';
 import rupee from '../../../../public/rupee.svg';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 const SignIn: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [messageApi, messageContextHolder] = message.useMessage();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { signin } = useContext(AuthContext);
+
+  // Get the redirect path from location state, or default to '/add-transaction'
+  const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
     if (err) {
@@ -36,8 +42,12 @@ const SignIn: React.FC = () => {
 
   const onFinish = async (values: any) => {
     try {
+      setIsLoading(true);
+
       const { email, password } = values;
       await signin(email, password);
+
+      navigate(from, { replace: true });
     } catch (error) {
       console.log(error);
       setErr('Unable to Sign In!!');
@@ -47,13 +57,7 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <Layout
-      style={{
-        height: '100%',
-        width: '100%',
-        background: '#f5f5f5',
-      }}
-    >
+    <Layout style={{ height: '100%', width: '100%' }}>
       <Flex
         style={{
           height: '100%',
@@ -65,12 +69,7 @@ const SignIn: React.FC = () => {
         vertical
       >
         {messageContextHolder}
-        <Space
-          direction="vertical"
-          size="large"
-          align="center"
-          style={{ marginBottom: 24 }}
-        >
+        <Space direction="vertical" align="center" style={{ marginBottom: 24 }}>
           <Image
             style={{
               width: 80,
@@ -87,74 +86,68 @@ const SignIn: React.FC = () => {
           </Typography.Text>
         </Space>
 
-        <Form
-          name="signin"
-          initialValues={{ remember: true }}
-          style={{
-            minWidth: 360,
-            maxWidth: 360,
-            background: 'white',
-            padding: '24px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          }}
-          onFinish={onFinish}
-          validateTrigger="onSubmit"
-        >
-          <Form.Item
-            name="email"
-            rules={[
-              {
-                type: 'email',
-                required: true,
-                message: 'Please input your Email!',
-              },
-            ]}
+        <Card style={{ minWidth: 360, maxWidth: 360 }}>
+          <Form
+            name="signin"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            validateTrigger="onSubmit"
           >
-            <Input size="large" prefix={<MailOutlined />} placeholder="Email" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please input your Password!' }]}
-          >
-            <Input.Password
-              size="large"
-              prefix={<LockOutlined />}
-              placeholder="Password"
-              visibilityToggle={true}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Flex justify="flex-end" align="center">
-              <Button type="link" style={{ padding: 0 }}>
-                <Link to="/forgot-password">Forgot password</Link>
+            <Form.Item
+              name="email"
+              rules={[
+                {
+                  type: 'email',
+                  required: true,
+                  message: 'Please input your Email!',
+                },
+              ]}
+            >
+              <Input prefix={<MailOutlined />} placeholder="Email" />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: 'Please input your Password!' },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+                visibilityToggle={true}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Flex justify="flex-end" align="center">
+                <Button type="link" style={{ padding: 0 }}>
+                  <Link to="/forgot-password">Forgot password</Link>
+                </Button>
+              </Flex>
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                loading={isLoading}
+                block
+                type="primary"
+                htmlType="submit"
+              >
+                Sign In
+              </Button>
+            </Form.Item>
+
+            <Divider plain>Or</Divider>
+
+            <Flex justify="center" align="center">
+              <Typography.Text type="secondary">
+                Don't have an account?
+              </Typography.Text>
+              <Button type="link" style={{ padding: '0 8px' }}>
+                <Link to="/signup">Sign Up</Link>
               </Button>
             </Flex>
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              loading={isLoading}
-              block
-              type="primary"
-              htmlType="submit"
-              size="large"
-            >
-              Sign In
-            </Button>
-          </Form.Item>
-
-          <Divider plain>Or</Divider>
-
-          <Flex justify="center" align="center">
-            <Typography.Text type="secondary">
-              Don't have an account?
-            </Typography.Text>
-            <Button type="link" style={{ padding: '0 8px' }}>
-              <Link to="/signup">Sign Up</Link>
-            </Button>
-          </Flex>
-        </Form>
+          </Form>
+        </Card>
       </Flex>
     </Layout>
   );

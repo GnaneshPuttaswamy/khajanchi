@@ -11,15 +11,19 @@ import { Navigate, Route, Routes } from 'react-router';
 import SignUp from './components/pages/auth/SignUp';
 import { AuthContext } from './context/AuthContext';
 import ForgotPassword from './components/pages/auth/ForgotPassword';
+import ProtectedRoute from './components/ProtectedRoute';
+import AddTransactionPage from './components/pages/add-transaction-page/AddTransactionPage';
+import AllTransactionsPage from './components/pages/all-transactions-page/AllTransactionsPage';
+import AuthRoute from './components/AuthRoute';
+import NotFoundPage from './components/NotFoundPage';
 
 const App: React.FC = () => {
   const { isMobile, setIsMobile } = useContext(IsMobileContext);
   const { isDark } = useContext(ThemeContext);
   const { isCompact } = useContext(CompactModeContext);
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isLoading } = useContext(AuthContext);
 
   const [collapsed, setCollapsed] = useState(isMobile);
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -41,6 +45,11 @@ const App: React.FC = () => {
       clearTimeout(resizeTimer);
     };
   }, [setIsMobile, setCollapsed]);
+
+  if (isLoading) {
+    // Return a loading spinner or splash screen
+    return <div className="app-loading">Loading...</div>;
+  }
 
   return (
     <ConfigProvider
@@ -72,35 +81,60 @@ const App: React.FC = () => {
         ].filter(Boolean) as any,
       }}
     >
-      {/* <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} /> */}
-      {/* <SignIn /> */}
+      {/* Public routes - only accessible when not authenticated */}
       <Routes>
-        {/* Public routes (accessible without authentication) */}
-        <Route
-          path="/signin"
-          element={
-            isAuthenticated ? <Navigate to="/add-transaction" /> : <SignIn />
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            isAuthenticated ? <Navigate to="/add-transaction" /> : <SignUp />
-          }
-        />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route>
+          <Route
+            path="/signin"
+            element={
+              <AuthRoute>
+                <SignIn />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <AuthRoute>
+                <SignUp />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <AuthRoute>
+                <ForgotPassword />
+              </AuthRoute>
+            }
+          />
+        </Route>
 
-        {/* Protected routes (require authentication) */}
-        <Route
-          path="/*"
-          element={
-            isAuthenticated ? (
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route
+            element={
               <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} />
-            ) : (
-              <Navigate to="/signin" />
-            )
-          }
-        />
+            }
+          >
+            {/* Redirect root to add-transaction */}
+            <Route
+              path="/"
+              element={<Navigate to="/add-transaction" replace />}
+            />
+            <Route path="/add-transaction" element={<AddTransactionPage />} />
+            <Route
+              path="/transaction-history"
+              element={<AllTransactionsPage />}
+            />
+            <Route path="/settings" element={<div>To be implemented</div>} />
+          </Route>
+        </Route>
+
+        {/* 404 route - outside the AppLayout but still protected */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Routes>
     </ConfigProvider>
   );
