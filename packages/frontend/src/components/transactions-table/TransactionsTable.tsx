@@ -51,13 +51,7 @@ const baseColumns: TableProps<Transaction>['columns'] = [
     dataIndex: TRANSACTION_COLUMN_FIELDS.DATE,
     width: '15%',
     minWidth: 120,
-    render: (text: string) => (
-      <Tooltip
-        title={`${dayjs.utc(text).local().format('YYYY-MM-DD HH:mm:ss')}`}
-      >
-        {dayjs.utc(text).local().format('Do, MMM YYYY')}
-      </Tooltip>
-    ),
+    render: (text: string) => dayjs.utc(text).local().format('Do, MMM YYYY'),
   },
   {
     title: 'Amount',

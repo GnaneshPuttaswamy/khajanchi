@@ -66,23 +66,36 @@ export abstract class BaseUseCase<
 
       if (!token) {
         logger.warn('Authentication attempt with missing token');
-        throw new Error('Unauthorized request');
+        throw new Error('AUTH_NO_TOKEN');
       }
 
-      const payload: any = jwt.verify(token, process.env.JWT_SECRET!);
-      logger.debug('User authenticated successfully', { payload });
+      try {
+        const payload: any = jwt.verify(token, process.env.JWT_SECRET!);
+        logger.debug('User authenticated successfully', { payload });
 
-      const userRepository = new UserRepository();
-      const user = await userRepository.model().findByPk(payload?.id, {
-        attributes: { exclude: ['password'] },
-        raw: true,
-      });
+        const userRepository = new UserRepository();
+        const user = await userRepository.model().findByPk(payload?.id, {
+          attributes: { exclude: ['password'] },
+          raw: true,
+        });
 
-      if (!user) {
-        throw new Error("User doesn't exist");
+        if (!user) {
+          throw new Error('AUTH_USER_NOT_FOUND');
+        }
+
+        return user;
+      } catch (jwtError) {
+        if ((jwtError as Error).name === 'TokenExpiredError') {
+          logger.warn('Authentication attempt with expired token');
+          throw new Error('AUTH_TOKEN_EXPIRED');
+        } else if ((jwtError as Error).name === 'JsonWebTokenError') {
+          logger.warn('Authentication attempt with invalid token');
+          throw new Error('AUTH_TOKEN_INVALID');
+        } else {
+          logger.warn('Authentication error', { error: (jwtError as Error).message });
+          throw new Error('AUTH_FAILED');
+        }
       }
-
-      return user;
     } catch (error) {
       logger.error('Authentication error', { error: (error as Error).message });
       throw error;
@@ -108,16 +121,38 @@ export abstract class BaseUseCase<
         return;
       }
 
-      logger.error(`Unhandled error: ${(error as Error).message}`, { stack: (error as Error).stack });
+      // Handle authentication errors with appropriate status codes and messages
+      const errorMessage = (error as Error).message;
 
-      this.response
-        .status(500)
-        .json(
-          BaseUseCase.error(
-            'INTERNAL_SERVER_ERROR',
-            process.env.NODE_ENV === 'production' ? 'Something went wrong' : (error as Error).message
-          )
-        );
+      switch (errorMessage) {
+        case 'AUTH_NO_TOKEN':
+          this.response.status(401).json(BaseUseCase.error('AUTH_NO_TOKEN', 'Authentication token is missing'));
+          return;
+        case 'AUTH_TOKEN_EXPIRED':
+          this.response.status(401).json(BaseUseCase.error('AUTH_TOKEN_EXPIRED', 'Authentication token has expired'));
+          return;
+        case 'AUTH_TOKEN_INVALID':
+          this.response.status(401).json(BaseUseCase.error('AUTH_TOKEN_INVALID', 'Authentication token is invalid'));
+          return;
+        case 'AUTH_USER_NOT_FOUND':
+          this.response
+            .status(401)
+            .json(BaseUseCase.error('AUTH_USER_NOT_FOUND', 'User associated with token not found'));
+          return;
+        case 'AUTH_FAILED':
+          this.response.status(401).json(BaseUseCase.error('AUTH_FAILED', 'Authentication failed'));
+          return;
+        default:
+          logger.error(`Unhandled error: ${errorMessage}`, { stack: (error as Error).stack });
+          this.response
+            .status(500)
+            .json(
+              BaseUseCase.error(
+                'INTERNAL_SERVER_ERROR',
+                process.env.NODE_ENV === 'production' ? 'Something went wrong' : errorMessage
+              )
+            );
+      }
     }
   }
 }

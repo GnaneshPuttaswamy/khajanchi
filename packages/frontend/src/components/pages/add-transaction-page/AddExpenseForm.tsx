@@ -2,7 +2,7 @@ import { Button, Form, Input, Card, message } from 'antd';
 import React, { useContext, useState } from 'react';
 import { Transaction } from '../../../types/types';
 import { IsMobileContext } from '../../../context/IsMobileContext';
-import axios from 'axios';
+import { axiosInstance } from '../../../utils/httpUtil';
 
 const placeholderText = `Describe your transactions in natural language. For example: 
 '₹90 at grocery store, ₹45 for bus pass
@@ -19,17 +19,9 @@ const parseTransactionText = async (
   transactionText: string
 ): Promise<Omit<Transaction, 'id'>[]> => {
   try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/parse-transactions`,
-      {
-        transactionsDescription: transactionText,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      }
-    );
+    const response = await axiosInstance.post('/parse-transactions', {
+      transactionsDescription: transactionText,
+    });
 
     return response.data.data.transactions || [];
   } catch (error) {
