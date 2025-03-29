@@ -16,6 +16,7 @@ import AddTransactionPage from './components/pages/add-transaction-page/AddTrans
 import AllTransactionsPage from './components/pages/all-transactions-page/AllTransactionsPage';
 import AuthRoute from './components/AuthRoute';
 import NotFoundPage from './components/NotFoundPage';
+import LoadingPage from './components/LoadingPage';
 
 const App: React.FC = () => {
   const { isMobile, setIsMobile } = useContext(IsMobileContext);
@@ -45,11 +46,6 @@ const App: React.FC = () => {
       clearTimeout(resizeTimer);
     };
   }, [setIsMobile, setCollapsed]);
-
-  if (isLoading) {
-    // Return a loading spinner or splash screen
-    return <div className="app-loading">Loading...</div>;
-  }
 
   return (
     <ConfigProvider
@@ -81,61 +77,65 @@ const App: React.FC = () => {
         ].filter(Boolean) as any,
       }}
     >
-      {/* Public routes - only accessible when not authenticated */}
-      <Routes>
-        <Route>
-          <Route
-            path="/signin"
-            element={
-              <AuthRoute>
-                <SignIn />
-              </AuthRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <AuthRoute>
-                <SignUp />
-              </AuthRoute>
-            }
-          />
-          <Route
-            path="/forgot-password"
-            element={
-              <AuthRoute>
-                <ForgotPassword />
-              </AuthRoute>
-            }
-          />
-        </Route>
-
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route
-            element={
-              <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} />
-            }
-          >
-            {/* Redirect root to add-transaction */}
+      {isLoading ? (
+        <LoadingPage />
+      ) : (
+        <Routes>
+          <Route>
             <Route
-              path="/"
-              element={<Navigate to="/add-transaction" replace />}
+              path="/signin"
+              element={
+                <AuthRoute>
+                  <SignIn />
+                </AuthRoute>
+              }
             />
-            <Route path="/add-transaction" element={<AddTransactionPage />} />
             <Route
-              path="/transaction-history"
-              element={<AllTransactionsPage />}
+              path="/signup"
+              element={
+                <AuthRoute>
+                  <SignUp />
+                </AuthRoute>
+              }
             />
-            <Route path="/settings" element={<div>To be implemented</div>} />
+            <Route
+              path="/forgot-password"
+              element={
+                <AuthRoute>
+                  <ForgotPassword />
+                </AuthRoute>
+              }
+            />
           </Route>
-        </Route>
 
-        {/* 404 route - outside the AppLayout but still protected */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route
+              element={
+                <AppLayout collapsed={collapsed} setCollapsed={setCollapsed} />
+              }
+            >
+              {/* Redirect root to add-transaction */}
+              <Route
+                path="/"
+                element={<Navigate to="/add-transaction" replace />}
+              />
+              <Route path="/add-transaction" element={<AddTransactionPage />} />
+              <Route
+                path="/transaction-history"
+                element={<AllTransactionsPage />}
+              />
+              <Route path="/settings" element={<div>To be implemented</div>} />
+            </Route>
+          </Route>
+
+          {/* 404 route - outside the AppLayout but still protected */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      )}
+      {/* Public routes - only accessible when not authenticated */}
     </ConfigProvider>
   );
 };
