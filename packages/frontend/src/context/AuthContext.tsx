@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { axiosInstance } from '../utils/httpUtil';
+import { AUTH_ERROR_EVENT, axiosInstance } from '../utils/httpUtil';
+import { useNavigate } from 'react-router';
+import { message } from 'antd';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -30,49 +32,99 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem('authToken');
   });
-
-  // useEffect(() => {
-  //   if (localStorage.getItem('authToken')) {
-  //     setIsAuthenticated(true);
-  //   }
-  // }, []);
+  const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    // Any additional auth validation could go here
-    // For example, checking if the token is valid/expired
+    const handleAuthError = (
+      event: CustomEvent<{ errorCode: string; errorMessage: string }>
+    ) => {
+      setIsAuthenticated(false);
+
+      const { errorCode, errorMessage } = event.detail;
+
+      switch (errorCode) {
+        case 'AUTH_TOKEN_EXPIRED':
+          messageApi.error('Your session has expired. Please sign in again.');
+          break;
+        case 'AUTH_TOKEN_INVALID':
+          messageApi.error('Invalid authentication. Please sign in again.');
+          break;
+        case 'AUTH_USER_NOT_FOUND':
+          messageApi.error(
+            'User account not found. Please sign in with a valid account.'
+          );
+          break;
+        case 'AUTH_NO_TOKEN':
+          messageApi.error('Authentication required. Please sign in.');
+          break;
+        default:
+          messageApi.error(
+            errorMessage || 'Authentication failed. Please sign in again.'
+          );
+      }
+
+      navigate('/signin', { replace: true });
+    };
+
+    window.addEventListener(AUTH_ERROR_EVENT, handleAuthError as any);
+
     setIsLoading(false);
-  }, []);
+
+    return () => {
+      window.removeEventListener(AUTH_ERROR_EVENT, handleAuthError as any);
+    };
+  }, [navigate, messageApi]);
 
   const signin = async (email: string, password: string) => {
-    const response = await axiosInstance.post('/users/login', {
-      email,
-      password,
-    });
+    try {
+      const response = await axiosInstance.post('/users/login', {
+        email,
+        password,
+      });
 
-    localStorage.setItem('authToken', response.data?.data?.token);
-    setIsAuthenticated(true);
+      localStorage.setItem('authToken', response.data?.data?.token);
+      setIsAuthenticated(true);
+
+      messageApi.success('Successfully signed in!');
+    } catch (error) {
+      messageApi.error('Failed to sign in. Please check your credentials.');
+      throw error;
+    }
   };
 
   const signup = async (email: string, password: string) => {
-    const response = await axiosInstance.post('/users/register', {
-      email,
-      password,
-    });
+    try {
+      const response = await axiosInstance.post('/users/register', {
+        email,
+        password,
+      });
 
-    localStorage.setItem('authToken', response.data?.data?.token);
-    setIsAuthenticated(true);
+      localStorage.setItem('authToken', response.data?.data?.token);
+      setIsAuthenticated(true);
+
+      messageApi.success('Successfully signed up!');
+    } catch (error) {
+      messageApi.error('Failed to sign up. Please try again.');
+      throw error;
+    }
   };
 
   const signout = () => {
     localStorage.removeItem('authToken');
     setIsAuthenticated(false);
+
+    messageApi.info('You have been signed out.');
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, signin, signup, signout }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <>
+      {contextHolder}
+      <AuthContext.Provider
+        value={{ isAuthenticated, isLoading, signin, signup, signout }}
+      >
+        {children}
+      </AuthContext.Provider>
+    </>
   );
 };

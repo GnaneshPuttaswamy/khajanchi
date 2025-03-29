@@ -12,8 +12,8 @@ import { AuthProvider } from './context/AuthContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <ThemeProvider>
           <CompactModeProvider>
             <IsMobileProvider>
@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')!).render(
             </IsMobileProvider>
           </CompactModeProvider>
         </ThemeProvider>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );
