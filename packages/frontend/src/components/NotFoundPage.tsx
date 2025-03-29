@@ -19,7 +19,6 @@ const NotFoundPage: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           padding: '24px',
-          backgroundColor: isDark ? '#1C1D20' : '#fdffff',
         }}
       >
         <Space
