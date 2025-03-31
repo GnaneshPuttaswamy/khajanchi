@@ -49,7 +49,7 @@ const SignIn: React.FC = () => {
 
       navigate(from, { replace: true });
     } catch (error) {
-      console.log(error);
+      console.error('SignIn :: onFinish() :: Error while signing in ', error);
       setErr('Unable to Sign In!!');
     } finally {
       setIsLoading(false);

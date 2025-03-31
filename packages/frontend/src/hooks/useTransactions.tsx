@@ -23,7 +23,10 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
         setTransactions(response.data.data || []);
       } catch (error) {
         setTransactions([]);
-        console.error('error ========> ', error);
+        console.error(
+          'useTranactions :: fetchTransactions() :: error => ',
+          error
+        );
         setErr('Failed to fetch transactions');
       } finally {
         setIsLoading(false);

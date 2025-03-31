@@ -150,7 +150,7 @@ function TransactionsTable({
       await updateTransaction(transactionId, { isConfirmed: true });
       await refreshTransactions(false);
     } catch (error) {
-      console.log('Error while deleting transaction => ', error);
+      console.error('Error while deleting transaction => ', error);
       // setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
       dispatch({
         type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID,
@@ -196,7 +196,7 @@ function TransactionsTable({
       await deleteTransaction(transactionId);
       await refreshTransactions(isConfirmedTransactions);
     } catch (error) {
-      console.log('Error while deleting transaction => ', error);
+      console.error('Error while deleting transaction => ', error);
       dispatch({
         type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID,
         payload: { id: transactionId },
@@ -369,8 +369,8 @@ function TransactionsTable({
     }
   );
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(20);
+  // const [currentPage, setCurrentPage] = useState<number>(1);
+  // const [pageSize, setPageSize] = useState<number>(20);
 
   return (
     <>
@@ -394,7 +394,7 @@ function TransactionsTable({
           }}
         ></Table>
       </Form>
-      {isConfirmedTransactions && (
+      {/* {isConfirmedTransactions && (
         <Flex vertical={false} justify="flex-end">
           <Pagination
             current={currentPage}
@@ -409,7 +409,7 @@ function TransactionsTable({
             showTotal={(total) => `Total ${total} items`}
           />
         </Flex>
-      )}
+      )} */}
     </>
   );
 }

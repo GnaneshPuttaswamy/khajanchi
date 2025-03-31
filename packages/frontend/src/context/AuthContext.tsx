@@ -3,9 +3,14 @@ import { AUTH_ERROR_EVENT, axiosInstance } from '../utils/httpUtil';
 import { useNavigate } from 'react-router';
 import { message } from 'antd';
 
+type User = {
+  email: string;
+};
+
 type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
+  user: User | null;
   signin: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   signout: () => void;
@@ -14,6 +19,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: true,
+  user: null,
   signin: async () => {
     throw new Error('signin not implemented');
   },
@@ -32,8 +38,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem('authToken');
   });
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosInstance.get('/users/profile');
+        console.log(
+          'AuthContext :: fetchUser() :: response.data.data => ',
+          response.data?.data
+        );
+        setUser(response.data?.data);
+      } catch (error) {
+        console.error(
+          'AuthContext ::  fetchUser() :: Failed to fetch user profile:',
+          error
+        );
+        messageApi.error('Failed to fetch user details');
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchUser();
+    } else {
+      setUser(null);
+    }
+  }, [isAuthenticated, messageApi]);
 
   useEffect(() => {
     const handleAuthError = (
@@ -121,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <>
       {contextHolder}
       <AuthContext.Provider
-        value={{ isAuthenticated, isLoading, signin, signup, signout }}
+        value={{ isAuthenticated, isLoading, user, signin, signup, signout }}
       >
         {children}
       </AuthContext.Provider>
