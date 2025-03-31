@@ -14,7 +14,6 @@ import {
   LayoutOutlined,
   TransactionOutlined,
   HistoryOutlined,
-  SettingOutlined,
   DownOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
@@ -48,7 +47,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   const location = useLocation();
   const { isDark } = useContext(ThemeContext);
   const { isMobile } = useContext(IsMobileContext);
-  const { signout } = useContext(AuthContext);
+  const { signout, user } = useContext(AuthContext);
 
   const items: MenuItem[] = [
     getItem(
@@ -61,11 +60,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
       '2',
       <HistoryOutlined />
     ),
-    getItem(
-      <Typography.Text>Settings</Typography.Text>,
-      '3',
-      <SettingOutlined />
-    ),
+    // getItem(
+    //   <Typography.Text>Settings</Typography.Text>,
+    //   '3',
+    //   <SettingOutlined />
+    // ),
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -124,7 +123,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
               size={!isMobile ? 'large' : undefined}
               icon={<UserOutlined />}
             />
-            <Typography.Text strong>User</Typography.Text>
+            <Typography.Text strong>{user?.email || '---'}</Typography.Text>
             <DownOutlined
               style={{
                 fontSize: 10,

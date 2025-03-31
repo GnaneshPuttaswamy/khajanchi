@@ -49,7 +49,7 @@ const SignUp: React.FC = () => {
 
       navigate(from, { replace: true });
     } catch (error) {
-      console.log(error);
+      console.error('SignUp :: onFinish() :: Error while signing up', error);
       setErr('Unable to Sign Up!!');
     } finally {
       setIsLoading(false);

@@ -25,3 +25,8 @@ export type UserLoginRequest = z.infer<typeof userLoginRequestSchema>;
 export type UserLoginData = {
   token: string;
 };
+
+// User Profile
+export type UserProfileData = {
+  email: string;
+};
