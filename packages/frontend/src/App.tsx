@@ -17,6 +17,7 @@ import AllTransactionsPage from './components/pages/all-transactions-page/AllTra
 import AuthRoute from './components/AuthRoute';
 import NotFoundPage from './components/NotFoundPage';
 import LoadingPage from './components/LoadingPage';
+import ResetPassword from './components/pages/auth/ResetPassword';
 
 const App: React.FC = () => {
   const { isMobile, setIsMobile } = useContext(IsMobileContext);
@@ -103,6 +104,14 @@ const App: React.FC = () => {
               element={
                 <AuthRoute>
                   <ForgotPassword />
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                <AuthRoute>
+                  <ResetPassword />
                 </AuthRoute>
               }
             />

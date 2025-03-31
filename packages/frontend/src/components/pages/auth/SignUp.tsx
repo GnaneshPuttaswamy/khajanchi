@@ -14,14 +14,13 @@ import {
   Card,
 } from 'antd';
 import { AuthContext } from '../../../context/AuthContext';
-import rupee from '../../../../public/rupee.svg';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 const SignUp: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [messageApi, messageContextHolder] = message.useMessage();
-
+  const [form] = Form.useForm();
   const { signup } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,7 +49,6 @@ const SignUp: React.FC = () => {
       navigate(from, { replace: true });
     } catch (error) {
       console.error('SignUp :: onFinish() :: Error while signing up', error);
-      setErr('Unable to Sign Up!!');
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +74,7 @@ const SignUp: React.FC = () => {
               height: 80,
             }}
             preview={false}
-            src={rupee}
+            src="/rupee.svg"
           />
           <Typography.Title level={2} style={{ margin: 0 }}>
             Create Account
@@ -92,22 +90,8 @@ const SignUp: React.FC = () => {
             initialValues={{ remember: true }}
             onFinish={onFinish}
             validateTrigger="onSubmit"
+            form={form}
           >
-            {/* <Form.Item
-              name="name"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input your full name!',
-                },
-              ]}
-            >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Full Name"
-              />
-            </Form.Item> */}
-
             <Form.Item
               name="email"
               rules={[
@@ -117,8 +101,13 @@ const SignUp: React.FC = () => {
                   message: 'Please input a valid email address!',
                 },
               ]}
+              validateTrigger="onSubmit"
             >
-              <Input prefix={<MailOutlined />} placeholder="Email" />
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="Email"
+                onChange={() => form.setFields([{ name: 'email', errors: [] }])}
+              />
             </Form.Item>
 
             <Form.Item
@@ -129,11 +118,15 @@ const SignUp: React.FC = () => {
                   message: 'Please input your password!',
                 },
               ]}
+              validateTrigger="onSubmit"
             >
               <Input.Password
                 prefix={<LockOutlined />}
                 placeholder="Password"
                 visibilityToggle={true}
+                onChange={() =>
+                  form.setFields([{ name: 'password', errors: [] }])
+                }
               />
             </Form.Item>
 

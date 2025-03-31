@@ -37,6 +37,11 @@ function getItem(
   } as MenuItem;
 }
 
+const truncateText = (text: string, maxLength: number) => {
+  if (!text) return '';
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
+
 interface SideMenuProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
@@ -123,7 +128,9 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
               size={!isMobile ? 'large' : undefined}
               icon={<UserOutlined />}
             />
-            <Typography.Text strong>{user?.email || '---'}</Typography.Text>
+            <Typography.Text ellipsis={{ tooltip: true }} strong>
+              {truncateText(user?.email || 'puttadt@gmail.com', 15)}
+            </Typography.Text>
             <DownOutlined
               style={{
                 fontSize: 10,

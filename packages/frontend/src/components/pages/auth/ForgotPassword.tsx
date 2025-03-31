@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MailOutlined, LockOutlined, KeyOutlined } from '@ant-design/icons';
+import { MailOutlined } from '@ant-design/icons';
 import {
   Button,
   Form,
@@ -11,252 +11,40 @@ import {
   Divider,
   Typography,
   Space,
-  Steps,
   Card,
+  Result,
 } from 'antd';
-import rupee from '../../../../public/rupee.svg';
 import { Link } from 'react-router';
+import { axiosInstance } from '../../../utils/httpUtil';
 
 const ForgotPassword: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [email, setEmail] = useState('');
   const [messageApi, messageContextHolder] = message.useMessage();
+  const [form] = Form.useForm();
 
-  // Request password reset
-  const requestReset = async (values: { email: string }) => {
+  const requestPasswordReset = async (values: { email: string }) => {
     try {
       setIsLoading(true);
       setEmail(values.email);
 
-      // TODO: Implement your password reset request API call here
-      // await passwordResetService.requestReset(values.email);
+      await axiosInstance.post('/users/request-password-reset', {
+        email: values.email,
+      });
 
-      // Mock API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      messageApi.success('Reset code has been sent to your email');
-      setCurrentStep(1);
+      // Always show success even if email doesn't exist (security best practice)
+      setIsSubmitted(true);
     } catch (error) {
-      console.error(error);
-      messageApi.error('Failed to send reset code. Please try again.');
+      console.error(
+        'ForgotPassword :: requestPasswordReset() :: Error while requesting password reset =>',
+        error
+      );
+      messageApi.error(
+        'Error while requesting password reset. Please try again.'
+      );
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Verify reset code
-  const verifyCode = async (values: { code: string }) => {
-    try {
-      setIsLoading(true);
-
-      // TODO: Implement your code verification API call here
-      // await passwordResetService.verifyCode(email, values.code);
-
-      // Mock API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setCurrentStep(2);
-    } catch (error) {
-      console.error(error);
-      messageApi.error('Invalid verification code. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Reset password
-  const resetPassword = async (values: { password: string }) => {
-    try {
-      setIsLoading(true);
-
-      // TODO: Implement your password reset API call here
-      // await passwordResetService.resetPassword(email, values.password);
-
-      // Mock API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      messageApi.success('Password reset successful!');
-
-      // Redirect to sign in page after a short delay
-      setTimeout(() => {
-        window.location.href = '/signin';
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-      messageApi.error('Failed to reset password. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <Form
-            name="reset-request"
-            initialValues={{ remember: true }}
-            onFinish={requestReset}
-          >
-            <Typography.Paragraph>
-              Enter your email address, and we'll send you a code to reset your
-              password.
-            </Typography.Paragraph>
-
-            <Form.Item
-              name="email"
-              rules={[
-                {
-                  type: 'email',
-                  required: true,
-                  message: 'Please input your email address!',
-                },
-              ]}
-            >
-              <Input prefix={<MailOutlined />} placeholder="Email" />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                loading={isLoading}
-                block
-                type="primary"
-                htmlType="submit"
-              >
-                Send Reset Code
-              </Button>
-            </Form.Item>
-          </Form>
-        );
-
-      case 1:
-        return (
-          <Form
-            name="verify-code"
-            initialValues={{ remember: true }}
-            onFinish={verifyCode}
-          >
-            <Typography.Paragraph>
-              We've sent a verification code to <strong>{email}</strong>. Please
-              enter the code below.
-            </Typography.Paragraph>
-
-            <Form.Item
-              name="code"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input verification code!',
-                },
-                {
-                  min: 6,
-                  max: 6,
-                  message: 'Verification code must be 6 digits',
-                },
-              ]}
-            >
-              <Input
-                prefix={<KeyOutlined />}
-                placeholder="Verification Code"
-                maxLength={6}
-              />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                loading={isLoading}
-                block
-                type="primary"
-                htmlType="submit"
-              >
-                Verify Code
-              </Button>
-            </Form.Item>
-
-            <Form.Item>
-              <Flex justify="center">
-                <Button type="link" onClick={() => setCurrentStep(0)}>
-                  Send a new code
-                </Button>
-              </Flex>
-            </Form.Item>
-          </Form>
-        );
-
-      case 2:
-        return (
-          <Form
-            name="reset-password"
-            initialValues={{ remember: true }}
-            onFinish={resetPassword}
-          >
-            <Typography.Paragraph>
-              Enter your new password.
-            </Typography.Paragraph>
-
-            <Form.Item
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input your new password!',
-                },
-                {
-                  min: 6,
-                  message: 'Password must be at least 6 characters',
-                },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder="New Password"
-                visibilityToggle={true}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="confirmPassword"
-              dependencies={['password']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please confirm your new password!',
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error('The two passwords do not match!')
-                    );
-                  },
-                }),
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder="Confirm New Password"
-                visibilityToggle={true}
-              />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                loading={isLoading}
-                block
-                type="primary"
-                htmlType="submit"
-              >
-                Reset Password
-              </Button>
-            </Form.Item>
-          </Form>
-        );
-
-      default:
-        return null;
     }
   };
 
@@ -280,35 +68,71 @@ const ForgotPassword: React.FC = () => {
               height: 80,
             }}
             preview={false}
-            src={rupee}
+            src="/rupee.svg"
           />
           <Typography.Title level={2} style={{ margin: 0 }}>
             Reset Password
           </Typography.Title>
           <Typography.Text type="secondary">
-            Follow the steps to reset your password
+            We'll send you a reset link via email
           </Typography.Text>
         </Space>
 
         <Card style={{ minWidth: 360, maxWidth: 360 }}>
-          <Steps
-            current={currentStep}
-            size="small"
-            style={{ marginBottom: 24 }}
-            items={[
-              {
-                title: 'Request',
-              },
-              {
-                title: 'Verify',
-              },
-              {
-                title: 'Reset',
-              },
-            ]}
-          />
+          {!isSubmitted ? (
+            <Form
+              form={form}
+              name="resetRequest"
+              initialValues={{ remember: true }}
+              onFinish={requestPasswordReset}
+            >
+              <Typography.Paragraph>
+                Enter your email address, and we'll send you a link to reset
+                your password.
+              </Typography.Paragraph>
 
-          {renderStepContent()}
+              <Form.Item
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your email address!',
+                  },
+                ]}
+                validateTrigger="onSubmit"
+              >
+                <Input
+                  prefix={<MailOutlined />}
+                  placeholder="Email"
+                  onChange={() =>
+                    form.setFields([{ name: 'email', errors: [] }])
+                  }
+                />
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                  loading={isLoading}
+                  block
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Send Reset Link
+                </Button>
+              </Form.Item>
+            </Form>
+          ) : (
+            <Result
+              status="success"
+              title="Email Sent!"
+              subTitle={`We've sent a password reset link to ${email}. Please check your inbox and follow the instructions to reset your password.`}
+              extra={[
+                <Button type="primary" key="console">
+                  <Link to="/signin">Back to Sign In</Link>
+                </Button>,
+              ]}
+            />
+          )}
 
           <Divider plain>Or</Divider>
 

@@ -41,7 +41,14 @@ export class ParseTransactionsUseCase extends BaseUseCase<{}, {}, ParseTransacti
         messages: [
           {
             role: 'system',
-            content: `You will be provided with spends done by the user in natural language. Your task is to parse and categorise the expenses in valid categories. If the given input doesn't contain any data about the expenses then return an error. Today's date is ${todaysDate}`,
+            content: `You will receive a description of expenses written in natural language. Your task is to extract individual transactions and represent them in structured format with the following fields:
+      
+            - date: ISO 8601 format (e.g., 2021-09-01T14:30:00Z). If the date is not mentioned, use today's date: ${todaysDate}.
+            - amount: Numeric value of the expense.
+            - category: A one-word category inferred from the context (e.g., food, travel, shopping).
+            - description: A short and concise description of the transaction.
+            
+            If the input does not mention any valid expenses, return an error instead of a parsed response.`,
           },
           {
             role: 'user',

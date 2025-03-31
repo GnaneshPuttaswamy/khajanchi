@@ -34,7 +34,7 @@ export class LoginUserUseCase extends BaseUseCase<{}, {}, UserLoginRequest, {}, 
         { id: user.dataValues.id, email: user.dataValues.email },
         process.env.JWT_SECRET || 'some_jwt_secret',
         {
-          expiresIn: '1h',
+          expiresIn: '7d',
         }
       );
 
