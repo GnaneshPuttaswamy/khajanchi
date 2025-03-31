@@ -150,7 +150,10 @@ function TransactionsTable({
       await updateTransaction(transactionId, { isConfirmed: true });
       await refreshTransactions(false);
     } catch (error) {
-      console.error('Error while deleting transaction => ', error);
+      console.error(
+        'TransactionsTable :: onConfirm() :: Error while confirming transaction =>',
+        error
+      );
       // setConfirmingTransactionIds((prev) => prev.filter((id) => id !== transactionId));
       dispatch({
         type: TransactionsTableActionType.REMOVE_CONFIRMING_TRANSACTION_ID,
@@ -196,7 +199,10 @@ function TransactionsTable({
       await deleteTransaction(transactionId);
       await refreshTransactions(isConfirmedTransactions);
     } catch (error) {
-      console.error('Error while deleting transaction => ', error);
+      console.error(
+        'TransactionsTable :: onDelete() :: Error while deleting transaction =>',
+        error
+      );
       dispatch({
         type: TransactionsTableActionType.REMOVE_DELETING_TRANSACTION_ID,
         payload: { id: transactionId },
@@ -246,8 +252,8 @@ function TransactionsTable({
       form.resetFields();
       dispatch({ type: TransactionsTableActionType.CLEAR_EDITING_ID });
     } catch (error) {
-      console.log(
-        `Error while saving the record with id=${transactionId}`,
+      console.error(
+        `TransactionsTable :: onSave() :: Error while saving the record with id=${transactionId}`,
         error
       );
       setErr('Error while saving the record');

@@ -25,7 +25,10 @@ const parseTransactionText = async (
 
     return response.data.data.transactions || [];
   } catch (error) {
-    console.error('Error parsing transactions:', error);
+    console.error(
+      'AddExpenseForm :: parseTransactionText() :: Error parsing transactions =>',
+      error
+    );
     throw error;
   }
 };
@@ -56,11 +59,18 @@ function AddExpenseForm({
         `Successfully parsed ${parsedTransactions.length} transaction(s)!`
       );
     } catch (error) {
-      console.error('Error parsing transactions:', error);
+      console.error(
+        'AddExpenseForm :: handleFinish() :: Error parsing transactions =>',
+        error
+      );
       messageApi.error('Failed to parse transactions. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearError = () => {
+    form.setFields([{ name: 'transactionText', errors: [] }]);
   };
 
   return (
@@ -76,7 +86,7 @@ function AddExpenseForm({
         <Form.Item
           name="transactionText"
           rules={[{ required: true, message: validationMessage }]}
-          validateTrigger="onSubmit"
+          validateTrigger={'onSubmit'}
         >
           <Input.TextArea
             autoSize={{
@@ -84,6 +94,7 @@ function AddExpenseForm({
               maxRows: isMobile ? 4 : 6,
             }}
             placeholder={placeholderText}
+            onChange={clearError}
           />
         </Form.Item>
         <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>

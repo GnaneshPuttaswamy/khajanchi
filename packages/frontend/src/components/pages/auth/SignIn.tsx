@@ -14,7 +14,6 @@ import {
   Card,
 } from 'antd';
 import { AuthContext } from '../../../context/AuthContext';
-import rupee from '../../../../public/rupee.svg';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 const SignIn: React.FC = () => {
@@ -23,6 +22,7 @@ const SignIn: React.FC = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
   const navigate = useNavigate();
   const location = useLocation();
+  const [form] = Form.useForm();
 
   const { signin } = useContext(AuthContext);
 
@@ -50,7 +50,6 @@ const SignIn: React.FC = () => {
       navigate(from, { replace: true });
     } catch (error) {
       console.error('SignIn :: onFinish() :: Error while signing in ', error);
-      setErr('Unable to Sign In!!');
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +75,7 @@ const SignIn: React.FC = () => {
               height: 80,
             }}
             preview={false}
-            src={rupee}
+            src="/rupee.svg"
           />
           <Typography.Title level={2} style={{ margin: 0 }}>
             Welcome Back
@@ -92,6 +91,7 @@ const SignIn: React.FC = () => {
             initialValues={{ remember: true }}
             onFinish={onFinish}
             validateTrigger="onSubmit"
+            form={form}
           >
             <Form.Item
               name="email"
@@ -103,18 +103,26 @@ const SignIn: React.FC = () => {
                 },
               ]}
             >
-              <Input prefix={<MailOutlined />} placeholder="Email" />
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="Email"
+                onChange={() => form.setFields([{ name: 'email', errors: [] }])}
+              />
             </Form.Item>
             <Form.Item
               name="password"
               rules={[
                 { required: true, message: 'Please input your Password!' },
               ]}
+              validateTrigger="onSubmit"
             >
               <Input.Password
                 prefix={<LockOutlined />}
                 placeholder="Password"
                 visibilityToggle={true}
+                onChange={() =>
+                  form.setFields([{ name: 'password', errors: [] }])
+                }
               />
             </Form.Item>
             <Form.Item>

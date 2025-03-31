@@ -31,16 +31,34 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   ...restProps
 }) => {
   let inputNode;
+  const form = Form.useFormInstance();
+
+  const clearFieldError = () => {
+    form.setFields([
+      {
+        name: dataIndex,
+        errors: [],
+      },
+    ]);
+  };
 
   switch (dataIndex) {
     case TRANSACTION_COLUMN_FIELDS.AMOUNT:
-      inputNode = <InputNumber disabled={disabled} />;
+      inputNode = (
+        <InputNumber
+          controls={false}
+          disabled={disabled}
+          onChange={clearFieldError}
+          stringMode={false}
+          type="number"
+        />
+      );
       break;
     case TRANSACTION_COLUMN_FIELDS.DATE:
-      inputNode = <DatePicker disabled={disabled} />;
+      inputNode = <DatePicker disabled={disabled} onChange={clearFieldError} />;
       break;
     default:
-      inputNode = <Input disabled={disabled} />;
+      inputNode = <Input disabled={disabled} onChange={clearFieldError} />;
   }
 
   return (
