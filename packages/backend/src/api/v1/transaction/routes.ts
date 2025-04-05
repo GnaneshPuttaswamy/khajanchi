@@ -10,12 +10,18 @@ import {
   UpdateTransactionParams,
 } from './types.js';
 import { UpdateTransactionUseCase } from './UpdateTransactionUseCase.js';
+import { BulkAddTransactionUseCase } from './BulkAddTransactionUseCase.js';
 
 const router = express.Router();
 
 router.post('/transactions', async (req: Request, res: Response) => {
   const addTransactionUseCase = AddTransactionUseCase.create(req, res);
   await addTransactionUseCase.executeAndHandleErrors();
+});
+
+router.post('/transactions/bulk', async (req: Request, res: Response) => {
+  const bulkAddTransactionUseCase = BulkAddTransactionUseCase.create(req, res);
+  await bulkAddTransactionUseCase.executeAndHandleErrors();
 });
 
 router.get('/transactions', async (req: Request<{}, {}, GetAllTransactionsQuery, {}>, res: Response) => {

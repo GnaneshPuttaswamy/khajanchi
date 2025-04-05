@@ -11,7 +11,7 @@ const placeholderText = `Describe your transactions in natural language. For exa
 const validationMessage = 'Please enter your transaction details';
 
 interface AddExpenseFormProps {
-  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+  bulkAddTransactions: (transactions: Omit<Transaction, 'id'>[]) => void;
   refreshTransactions: (isConfirmed: boolean) => void;
 }
 
@@ -34,7 +34,7 @@ const parseTransactionText = async (
 };
 
 function AddExpenseForm({
-  addTransaction,
+  bulkAddTransactions,
   refreshTransactions,
 }: AddExpenseFormProps) {
   const [form] = Form.useForm();
@@ -48,9 +48,12 @@ function AddExpenseForm({
       const { transactionText } = values;
       const parsedTransactions = await parseTransactionText(transactionText);
 
-      for await (const transaction of parsedTransactions) {
-        await addTransaction(transaction);
-      }
+      console.log(
+        'AddExpenseForm :: handleFinish() :: parsedTransactions => ',
+        parsedTransactions
+      );
+
+      await bulkAddTransactions(parsedTransactions);
 
       await refreshTransactions(false);
       form.resetFields();

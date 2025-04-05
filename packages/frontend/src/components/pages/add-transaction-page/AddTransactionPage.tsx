@@ -8,7 +8,7 @@ function AddTransactionPage() {
     transactions,
     isLoading,
     refreshTransactions,
-    addTransaction,
+    bulkAddTransactions,
     deleteTransaction,
     updateTransaction,
     messageContextHolder,
@@ -18,7 +18,7 @@ function AddTransactionPage() {
     <>
       {messageContextHolder}
       <AddExpenseForm
-        addTransaction={addTransaction}
+        bulkAddTransactions={bulkAddTransactions}
         refreshTransactions={refreshTransactions}
       />
       <Card
