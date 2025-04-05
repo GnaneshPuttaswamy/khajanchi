@@ -58,6 +58,12 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
     await axiosInstance.post('/transactions', transaction);
   };
 
+  const bulkAddTransactions = async (
+    transactions: Omit<Transaction, 'id'>[]
+  ) => {
+    await axiosInstance.post('/transactions/bulk', { transactions });
+  };
+
   const deleteTransaction = async (id: React.Key) => {
     await axiosInstance.delete(`/transactions/${id}`);
   };
@@ -98,6 +104,7 @@ const useTransactions = ({ isConfirmed }: { isConfirmed: boolean }) => {
     isLoading,
     refreshTransactions,
     addTransaction,
+    bulkAddTransactions,
     deleteTransaction,
     updateTransaction,
   };

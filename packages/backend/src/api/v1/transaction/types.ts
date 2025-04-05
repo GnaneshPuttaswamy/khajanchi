@@ -5,6 +5,17 @@ import { IdParams } from '../../../core/zodSchemas/zodSchemas.js';
 const dateUtil = DateUtil.getInstance();
 
 // AddTransactionUseCase
+export type AddTransactionData = {
+  id: number;
+  date: Date;
+  amount: number;
+  category: string;
+  description: string;
+  isConfirmed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const addTransactionRequestSchema = z.object({
   date: z.preprocess(
     (val) => dateUtil.toUTCDate(val as any),
@@ -29,16 +40,15 @@ export const addTransactionRequestSchema = z.object({
 });
 
 export type AddTransactionRequest = z.infer<typeof addTransactionRequestSchema>;
-export type AddTransactionData = {
-  id: number;
-  date: Date;
-  amount: number;
-  category: string;
-  description: string;
-  isConfirmed: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-};
+
+// BulkAddTransactionUseCase
+export type BulkAddTransactionData = AddTransactionData[];
+
+export const bulkAddTransactionRequestSchema = z.object({
+  transactions: z.array(addTransactionRequestSchema),
+});
+
+export type BulkAddTransactionRequest = z.infer<typeof bulkAddTransactionRequestSchema>;
 
 // GetTransactionUseCase
 export type GetTransactionParams = IdParams;
