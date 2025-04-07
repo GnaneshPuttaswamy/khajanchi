@@ -1,8 +1,13 @@
-# Khajanchi
+# Khajanchi - Simple Expense Tracker
 
-A simple personal finance manager inspired by [Gullak](https://github.com/mr-karan/gullak).
+A simple expense tracker inspired by [Gullak](https://github.com/mr-karan/gullak).
 
 Enter your expenses in natural language, and let AI handle parsing and categorizing your transactions.
+
+![Khajanchi Add Transaction page with no transactions](./media/img1.png)
+![Khajanchi Add Transaction page with transactions](./media/img2.png)
+![Khajanchi Transaction History page with confirmed transactions](./media/img3.png)
+![Khajanchi Dark Theme](./media/img4.png)
 
 > **Note:** This application is currently under active development.
 
