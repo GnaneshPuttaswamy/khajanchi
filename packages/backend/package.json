@@ -8,7 +8,7 @@
     "prestart": "pnpm run build",
     "start": "node --env-file=.env dist/index.js",
     "build": "tsc",
-    "dev": "concurrently \"tsc --watch\" \"node --env-file=.env --watch dist/index.js\"",
+    "dev": "concurrently \"tsc --watch\" \"node --env-file=.env.development --watch dist/index.js\"",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --check .",
