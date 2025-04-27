@@ -8,16 +8,13 @@ import { CompactModeContext } from './context/CompactModeContext';
 import { IsMobileContext, isMobileDevice } from './context/IsMobileContext';
 import SignIn from './components/pages/auth/SignIn';
 import { Navigate, Route, Routes } from 'react-router';
-import SignUp from './components/pages/auth/SignUp';
 import { AuthContext } from './context/AuthContext';
-import ForgotPassword from './components/pages/auth/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddTransactionPage from './components/pages/add-transaction-page/AddTransactionPage';
 import AllTransactionsPage from './components/pages/all-transactions-page/AllTransactionsPage';
 import AuthRoute from './components/AuthRoute';
 import NotFoundPage from './components/NotFoundPage';
 import LoadingPage from './components/LoadingPage';
-import ResetPassword from './components/pages/auth/ResetPassword';
 
 const App: React.FC = () => {
   const { isMobile, setIsMobile } = useContext(IsMobileContext);
@@ -82,36 +79,13 @@ const App: React.FC = () => {
         <LoadingPage />
       ) : (
         <Routes>
+          {/* Public routes */}
           <Route>
             <Route
               path="/signin"
               element={
                 <AuthRoute>
                   <SignIn />
-                </AuthRoute>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <AuthRoute>
-                  <SignUp />
-                </AuthRoute>
-              }
-            />
-            <Route
-              path="/forgot-password"
-              element={
-                <AuthRoute>
-                  <ForgotPassword />
-                </AuthRoute>
-              }
-            />
-            <Route
-              path="/reset-password/:token"
-              element={
-                <AuthRoute>
-                  <ResetPassword />
                 </AuthRoute>
               }
             />
@@ -138,13 +112,11 @@ const App: React.FC = () => {
             </Route>
           </Route>
 
-          {/* 404 route - outside the AppLayout but still protected */}
           <Route element={<ProtectedRoute />}>
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       )}
-      {/* Public routes - only accessible when not authenticated */}
     </ConfigProvider>
   );
 };

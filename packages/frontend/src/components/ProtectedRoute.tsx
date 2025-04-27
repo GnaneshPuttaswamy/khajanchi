@@ -9,9 +9,7 @@ const ProtectedRoute = () => {
 
   if (!isAuthenticated) {
     // Don't include login-related paths in the redirect state
-    if (
-      ['/signin', '/signup', '/forgot-password'].includes(location.pathname)
-    ) {
+    if (['/signin'].includes(location.pathname)) {
       return <Navigate to="/signin" replace />;
     }
 

@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "Gnanesh Puttaswamy",
   "license": "MIT",
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@10.9.0",
   "dependencies": {
     "uuid": "^11.1.0"
   },

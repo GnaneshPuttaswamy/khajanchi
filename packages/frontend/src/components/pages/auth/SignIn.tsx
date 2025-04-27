@@ -1,32 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { LockOutlined, MailOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Form,
-  Input,
-  Flex,
-  message,
-  Layout,
-  Image,
-  Divider,
-  Typography,
-  Space,
-  Card,
-} from 'antd';
+import { GoogleOutlined } from '@ant-design/icons';
+import { Button, Flex, message, Layout, Image, Typography, Space } from 'antd';
 import { AuthContext } from '../../../context/AuthContext';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { useGoogleLogin } from '@react-oauth/google';
+import { axiosInstance } from '../../../utils/httpUtil';
 
 const SignIn: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [messageApi, messageContextHolder] = message.useMessage();
   const navigate = useNavigate();
   const location = useLocation();
-  const [form] = Form.useForm();
 
-  const { signin } = useContext(AuthContext);
+  const { setIsAuthenticated } = useContext(AuthContext);
 
-  // Get the redirect path from location state, or default to '/add-transaction'
+  // Get the redirect path from location state, or default to '/'
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
@@ -40,20 +29,67 @@ const SignIn: React.FC = () => {
     }
   }, [err, messageApi]);
 
-  const onFinish = async (values: any) => {
-    try {
-      setIsLoading(true);
+  const googleSignin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log(
+        'AuthContext :: googleSignin() :: onSuccess() :: tokenResponse => ',
+        tokenResponse
+      );
 
-      const { email, password } = values;
-      await signin(email, password);
+      try {
+        const response = await axiosInstance.post('/users/google/login', {
+          ...tokenResponse,
+        });
 
-      navigate(from, { replace: true });
-    } catch (error) {
-      console.error('SignIn :: onFinish() :: Error while signing in ', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        console.log(
+          'AuthContext :: googleSignin() :: onSuccess() :: response => ',
+          response
+        );
+
+        const token = response?.data?.data?.token;
+
+        if (token) {
+          localStorage.setItem('authToken', token);
+          setIsAuthenticated(true);
+          messageApi.success('Successfully signed in with Google!');
+          navigate(from, { replace: true });
+        } else {
+          throw new Error('Authentication token not found in response');
+        }
+      } catch (error: any) {
+        console.error(
+          'AuthContext :: googleSignin() :: onSuccess() :: /api/v1/auth/google/exchange-code error => ',
+          error
+        );
+
+        const errorMessage =
+          error.response?.data?.error?.message ||
+          'Google Sign-In failed. Please try again.';
+
+        setErr(errorMessage);
+      } finally {
+        setIsGoogleLoading(false);
+      }
+    },
+    onError: (error) => {
+      console.log(
+        'AuthContext :: googleSignin() :: onError() :: error => ',
+        error
+      );
+      messageApi.error(
+        error?.error_description || 'Google Sign-In process failed.'
+      );
+      setIsGoogleLoading(false);
+    },
+    onNonOAuthError: (error) => {
+      console.log(
+        'AuthContext :: googleSignin() :: onNonOAuthError() :: error => ',
+        error
+      );
+      setIsGoogleLoading(false);
+    },
+    flow: 'auth-code',
+  });
 
   return (
     <Layout style={{ height: '100%', width: '100%' }}>
@@ -78,84 +114,28 @@ const SignIn: React.FC = () => {
             src="/rupee.svg"
           />
           <Typography.Title level={2} style={{ margin: 0 }}>
-            Welcome Back
+            Welcome to Khajanchi
           </Typography.Title>
           <Typography.Text type="secondary">
-            Please sign in to your account
+            Please sign in with Google to continue
           </Typography.Text>
         </Space>
 
-        <Card style={{ minWidth: 360, maxWidth: 360 }}>
-          <Form
-            name="signin"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            validateTrigger="onSubmit"
-            form={form}
-          >
-            <Form.Item
-              name="email"
-              rules={[
-                {
-                  type: 'email',
-                  required: true,
-                  message: 'Please input your Email!',
-                },
-              ]}
-            >
-              <Input
-                prefix={<MailOutlined />}
-                placeholder="Email"
-                onChange={() => form.setFields([{ name: 'email', errors: [] }])}
-              />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              rules={[
-                { required: true, message: 'Please input your Password!' },
-              ]}
-              validateTrigger="onSubmit"
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder="Password"
-                visibilityToggle={true}
-                onChange={() =>
-                  form.setFields([{ name: 'password', errors: [] }])
-                }
-              />
-            </Form.Item>
-            <Form.Item>
-              <Flex justify="flex-end" align="center">
-                <Button type="link" style={{ padding: 0 }}>
-                  <Link to="/forgot-password">Forgot password</Link>
-                </Button>
-              </Flex>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                loading={isLoading}
-                block
-                type="primary"
-                htmlType="submit"
-              >
-                Sign In
-              </Button>
-            </Form.Item>
-
-            <Divider plain>Or</Divider>
-
-            <Flex justify="center" align="center">
-              <Typography.Text type="secondary">
-                Don't have an account?
-              </Typography.Text>
-              <Button type="link" style={{ padding: '0 8px' }}>
-                <Link to="/signup">Sign Up</Link>
-              </Button>
-            </Flex>
-          </Form>
-        </Card>
+        <Button
+          style={{ maxWidth: 300, marginTop: 24 }}
+          loading={isGoogleLoading}
+          disabled={isGoogleLoading}
+          block
+          type="primary"
+          size="large"
+          icon={<GoogleOutlined />}
+          onClick={() => {
+            setIsGoogleLoading(true);
+            googleSignin();
+          }}
+        >
+          Sign In with Google
+        </Button>
       </Flex>
     </Layout>
   );

@@ -11,8 +11,5 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: true,
     },
-    esbuild: {
-      drop: ['console', 'debugger'],
-    },
   };
 });

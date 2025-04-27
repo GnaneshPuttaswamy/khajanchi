@@ -14,4 +14,4 @@ COPY packages/frontend/ ./packages/frontend
 
 EXPOSE 5174
 
-CMD pnpm --filter khajanchi run dev
+CMD pnpm install && pnpm --filter khajanchi run dev
