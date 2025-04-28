@@ -1,14 +1,4 @@
-import {
-  Flex,
-  Form,
-  message,
-  Pagination,
-  Space,
-  Table,
-  TableProps,
-  Tag,
-  Tooltip,
-} from 'antd';
+import { Form, message, Space, Table, TableProps, Tag } from 'antd';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Transaction } from '../../types/types';
 import {
@@ -52,12 +42,14 @@ const baseColumns: TableProps<Transaction>['columns'] = [
     width: '15%',
     minWidth: 120,
     render: (text: string) => dayjs.utc(text).local().format('Do, MMM YYYY'),
+    sorter: (a, b) => dayjs(a.date).diff(dayjs(b.date)),
   },
   {
     title: 'Amount',
     dataIndex: TRANSACTION_COLUMN_FIELDS.AMOUNT,
     width: '10%',
     minWidth: 100,
+    sorter: (a, b) => a.amount - b.amount,
   },
   {
     title: 'Category',
@@ -68,6 +60,7 @@ const baseColumns: TableProps<Transaction>['columns'] = [
       const color = categoryColors[text.toLowerCase()] || '';
       return <Tag color={color}>{text}</Tag>;
     },
+    sorter: (a, b) => a.category.localeCompare(b.category),
   },
   {
     title: 'Description',
@@ -375,9 +368,6 @@ function TransactionsTable({
     }
   );
 
-  // const [currentPage, setCurrentPage] = useState<number>(1);
-  // const [pageSize, setPageSize] = useState<number>(20);
-
   return (
     <>
       {contextHolder}
@@ -395,27 +385,11 @@ function TransactionsTable({
           scroll={{
             x: 'max-content',
             y: isConfirmedTransactions
-              ? `calc(100vh - ${isCompact ? 230 : 280}px)`
-              : `calc(100vh - ${isCompact ? 440 : 550}px)`,
+              ? `calc(100vh - ${isCompact ? 244 : 283}px)`
+              : `calc(100vh - ${isCompact ? 499 : 598}px)`,
           }}
         ></Table>
       </Form>
-      {/* {isConfirmedTransactions && (
-        <Flex vertical={false} justify="flex-end">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            size="small"
-            total={transactions.length}
-            onChange={(page, size) => {
-              setCurrentPage(page);
-              setPageSize(size || 20);
-            }}
-            showSizeChanger
-            showTotal={(total) => `Total ${total} items`}
-          />
-        </Flex>
-      )} */}
     </>
   );
 }

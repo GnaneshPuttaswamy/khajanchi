@@ -122,22 +122,29 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
           pointerEvents: collapsed ? 'none' : 'auto',
         }}
       >
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+        <Dropdown menu={{ items: userMenuItems }}>
           <Flex gap="small" align="center">
             <Avatar
               size={!isMobile ? 'large' : undefined}
               icon={<UserOutlined />}
+              src={user?.avatarUrl}
             />
             <Typography.Text ellipsis={{ tooltip: true }} strong>
-              {truncateText(user?.email || 'puttadt@gmail.com', 15)}
+              {truncateText(user?.firstName || '---', 15)}
             </Typography.Text>
-            <DownOutlined
-              style={{
-                fontSize: 10,
-                position: 'relative',
-                top: 1,
-              }}
-            />
+            <Button
+              type="text"
+              size="small"
+              icon={
+                <DownOutlined
+                  size={8}
+                  style={{
+                    top: 1,
+                    position: 'relative',
+                  }}
+                />
+              }
+            ></Button>
           </Flex>
         </Dropdown>
         <Button

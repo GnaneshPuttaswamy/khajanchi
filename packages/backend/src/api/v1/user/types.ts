@@ -3,6 +3,9 @@ import { z } from 'zod';
 // User Profile
 export type UserProfileData = {
   email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
 };
 
 // Google Sign In

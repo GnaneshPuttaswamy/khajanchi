@@ -6,6 +6,9 @@ import { googleLogout } from '@react-oauth/google';
 
 type User = {
   email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
 };
 
 type AuthContextType = {

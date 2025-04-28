@@ -1,8 +1,10 @@
-import { Card, Space } from 'antd';
+import { Card, DatePicker, Flex } from 'antd';
 import React, { useContext } from 'react';
 import TransactionsTable from '../../transactions-table/TransactionsTable';
 import { CompactModeContext } from '../../../context/CompactModeContext';
 import useTransactions from '../../../hooks/useTransactions';
+import CategoryFilter from '../../common/CategoryFilter';
+import TablePagination from '../../common/TablePagination';
 
 function AllTransactionsPage() {
   const { isCompact } = useContext(CompactModeContext);
@@ -24,20 +26,31 @@ function AllTransactionsPage() {
       <Card
         loading={isLoading}
         title={
-          <Space>
-            <span>All Transactions</span>
-          </Space>
+          <Flex justify="space-between" align="center">
+            <span
+              style={{
+                flex: 1,
+              }}
+            >
+              All Transactions
+            </span>
+            <Flex gap="small" flex={1} justify="flex-end">
+              <DatePicker.RangePicker variant="filled" size="small" />
+              <CategoryFilter />
+            </Flex>
+          </Flex>
         }
         style={{
           flex: 1,
         }}
         styles={{
           body: {
-            height: `calc(100vh - ${isCompact ? '130px' : '150px'})`,
+            height: `calc(100vh - ${isCompact ? '178px' : '198px'})`,
             display: 'flex',
             flexDirection: 'column',
           },
         }}
+        actions={[<TablePagination />]}
       >
         <TransactionsTable
           transactions={transactions}
