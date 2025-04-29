@@ -1,7 +1,6 @@
 services:
-
   khajanchi-web:
-    build: 
+    build:
       context: .
       dockerfile: ./packages/frontend/Dockerfile.development
     container_name: khajanchi-web-development
@@ -16,9 +15,9 @@ services:
         condition: service_healthy
     networks:
       - khajanchi-network-development
-  
+
   khajanchi-api:
-    build: 
+    build:
       context: .
       dockerfile: ./packages/backend/Dockerfile.development
     container_name: khajanchi-api-development
@@ -37,7 +36,13 @@ services:
       khajanchi-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/v1/healthcheck', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/v1/healthcheck', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,20 +51,27 @@ services:
       - khajanchi-network-development
 
   khajanchi-db:
-    image: mysql:8.4
+    image: postgres:17.4
     container_name: khajanchi-db-development
     restart: unless-stopped
     environment:
-      - MYSQL_USER=${DB_USERNAME:-khajanchi}
-      - MYSQL_PASSWORD=${DB_PASSWORD:-khajanchi}
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-khajanchi}
-      - MYSQL_DATABASE=${DB_DATABASE:-khajanchi}
+      - POSTGRES_USER=${DB_USERNAME:-khajanchi}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-khajanchi}
+      - POSTGRES_DATABASE=${DB_DATABASE:-khajanchi}
     ports:
-      - "3307:3306"
+      - "5433:5432"
     volumes:
-      - khajanchi-db-data-development:/var/lib/mysql
+      - khajanchi-db-data-development:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-U",
+          "${DB_USERNAME:-khajanchi}",
+          "-d",
+          "${DB_DATABASE:-khajanchi}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5

@@ -22,10 +22,8 @@ class Database {
       },
       timezone: '+00:00',
       dialectOptions: {
-        dateStrings: true,
-        typeCast: true,
-        timezone: '+00:00',
-        decimalNumbers: true,
+        application_name: 'khajanchi-postgres',
+        client_encoding: 'UTF8',
       },
     });
   }

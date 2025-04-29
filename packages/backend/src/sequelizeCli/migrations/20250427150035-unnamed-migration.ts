@@ -92,11 +92,6 @@ export default {
     try {
       dbTransaction = await queryInterface.sequelize.transaction();
 
-      await queryInterface.sequelize.query(`
-        DROP INDEX unique_google_sub
-        ON ${DATABASE_CONSTANTS.TABLES.USER}
-      `);
-
       await queryInterface.removeColumn(DATABASE_CONSTANTS.TABLES.USER, 'firstName');
 
       await queryInterface.removeColumn(DATABASE_CONSTANTS.TABLES.USER, 'lastName');
