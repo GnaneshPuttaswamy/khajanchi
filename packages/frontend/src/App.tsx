@@ -15,6 +15,7 @@ import AllTransactionsPage from './components/pages/all-transactions-page/AllTra
 import AuthRoute from './components/AuthRoute';
 import NotFoundPage from './components/NotFoundPage';
 import LoadingPage from './components/LoadingPage';
+import Dashboard from './components/pages/Dashboard';
 
 const App: React.FC = () => {
   const { isMobile, setIsMobile } = useContext(IsMobileContext);
@@ -99,16 +100,16 @@ const App: React.FC = () => {
               }
             >
               {/* Redirect root to add-transaction */}
-              <Route
-                path="/"
-                element={<Navigate to="/add-transaction" replace />}
-              />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+              <Route path="/dashboard" element={<Dashboard />} />
+
               <Route path="/add-transaction" element={<AddTransactionPage />} />
+
               <Route
                 path="/transaction-history"
                 element={<AllTransactionsPage />}
               />
-              <Route path="/settings" element={<div>To be implemented</div>} />
             </Route>
           </Route>
 

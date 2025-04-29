@@ -16,6 +16,7 @@ import {
   HistoryOutlined,
   DownOutlined,
   LogoutOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { ThemeContext } from '../../context/ThemeContext';
@@ -56,29 +57,29 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
 
   const items: MenuItem[] = [
     getItem(
-      <Typography.Text>Add Transaction</Typography.Text>,
+      <Typography.Text>Dashboard</Typography.Text>,
       '1',
+      <LineChartOutlined />
+    ),
+    getItem(
+      <Typography.Text>Add Transaction</Typography.Text>,
+      '2',
       <TransactionOutlined />
     ),
     getItem(
       <Typography.Text>Transaction History</Typography.Text>,
-      '2',
+      '3',
       <HistoryOutlined />
     ),
-    // getItem(
-    //   <Typography.Text>Settings</Typography.Text>,
-    //   '3',
-    //   <SettingOutlined />
-    // ),
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key === '1') {
-      navigate('/add-transaction');
+      navigate('/dashboard');
     } else if (key === '2') {
-      navigate('/transaction-history');
+      navigate('/add-transaction');
     } else if (key === '3') {
-      navigate('/settings');
+      navigate('/transaction-history');
     }
 
     // Close the menu on mobile after navigation
@@ -89,9 +90,9 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
 
   const getSelectedKey = () => {
     const path = location.pathname;
-    if (path === '/add-transaction') return ['1'];
-    if (path === '/transaction-history') return ['2'];
-    if (path === '/settings') return ['3'];
+    if (path === '/dashboard') return ['1'];
+    if (path === '/add-transaction') return ['2'];
+    if (path === '/transaction-history') return ['3'];
     return ['1']; // Default to Add Transaction
   };
 

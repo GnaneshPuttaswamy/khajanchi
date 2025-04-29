@@ -1,4 +1,4 @@
-import { Flex } from 'antd';
+import { Flex, FloatButton, Tooltip } from 'antd';
 import { Layout, theme } from 'antd';
 import React, { useContext, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
@@ -6,6 +6,11 @@ import SideMenu from './SideMenu';
 import ContentHeader from './content-header/ContentHeader';
 import { ThemeContext } from '../../context/ThemeContext';
 import { IsMobileContext } from '../../context/IsMobileContext';
+import {
+  PlusCircleFilled,
+  PlusCircleTwoTone,
+  PlusOutlined,
+} from '@ant-design/icons';
 const { Content, Sider } = Layout;
 
 function AppLayout({
@@ -116,6 +121,15 @@ function AppLayout({
           >
             <Outlet />
           </Flex>
+          <FloatButton
+            style={{
+              right: 50,
+            }}
+            onClick={() => console.log('onClick')}
+            icon={<PlusOutlined />}
+            type="primary"
+            tooltip={'Add Transaction'}
+          />
         </Content>
       </Layout>
     </Layout>

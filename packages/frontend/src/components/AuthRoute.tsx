@@ -9,10 +9,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (isAuthenticated) {
     return (
-      <Navigate
-        to={location.state?.from?.pathname || '/add-transaction'}
-        replace
-      />
+      <Navigate to={location.state?.from?.pathname || '/dashboard'} replace />
     );
   }
 

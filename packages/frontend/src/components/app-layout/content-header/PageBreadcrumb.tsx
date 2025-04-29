@@ -1,6 +1,10 @@
 import React from 'react';
 import { Breadcrumb, Flex, Typography } from 'antd';
-import { HistoryOutlined, SettingOutlined, TransactionOutlined } from '@ant-design/icons';
+import {
+  HistoryOutlined,
+  LineChartOutlined,
+  TransactionOutlined,
+} from '@ant-design/icons';
 
 interface PageBreadcrumbProps {
   path: string;
@@ -8,6 +12,15 @@ interface PageBreadcrumbProps {
 
 const PageBreadcrumb: React.FC<PageBreadcrumbProps> = ({ path }) => {
   const getBreadcrumbTitle = () => {
+    if (path === '/dashboard') {
+      return (
+        <Flex vertical={false} gap="middle" align="center">
+          <LineChartOutlined />
+          <Typography.Text>Dashboard</Typography.Text>
+        </Flex>
+      );
+    }
+
     if (path === '/add-transaction') {
       return (
         <Flex vertical={false} gap="middle" align="center">
@@ -16,6 +29,7 @@ const PageBreadcrumb: React.FC<PageBreadcrumbProps> = ({ path }) => {
         </Flex>
       );
     }
+
     if (path === '/transaction-history') {
       return (
         <Flex vertical={false} gap="middle" align="center">
@@ -24,14 +38,7 @@ const PageBreadcrumb: React.FC<PageBreadcrumbProps> = ({ path }) => {
         </Flex>
       );
     }
-    if (path === '/settings') {
-      return (
-        <Flex vertical={false} gap="middle" align="center">
-          <SettingOutlined />
-          <Typography.Text>Settings</Typography.Text>
-        </Flex>
-      );
-    }
+
     return (
       <Flex vertical={false} gap="middle" align="center">
         <TransactionOutlined />
