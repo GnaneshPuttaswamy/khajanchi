@@ -12,7 +12,6 @@ export interface IUserAttributes {
   avatarUrl: string;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }
 
 export interface IUserCreationAttributes
@@ -63,10 +62,6 @@ UserModel.init(
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    deletedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
     },
   },
   {

@@ -76,6 +76,7 @@ export default {
 
       await dbTransaction.commit();
     } catch (error) {
+      console.error('Error in up migration: 20250427150035-unnamed-migration.ts :: error ==> ', error);
       await dbTransaction!.rollback();
       throw error;
     }
@@ -110,6 +111,7 @@ export default {
 
       await dbTransaction.commit();
     } catch (error) {
+      console.error('Error in down migration: 20250427150035-unnamed-migration.ts :: error ==> ', error);
       await dbTransaction!.rollback();
       throw error;
     }

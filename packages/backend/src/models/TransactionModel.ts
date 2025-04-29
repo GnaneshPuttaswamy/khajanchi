@@ -12,7 +12,6 @@ export interface ITransactionAttributes {
   userId: number;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }
 
 interface ITransactionCreationAttributes extends Optional<ITransactionAttributes, 'id'> {}
@@ -31,8 +30,8 @@ TransactionModel.init(
       allowNull: false,
     },
     amount: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     category: {
       type: DataTypes.STRING,
@@ -67,10 +66,6 @@ TransactionModel.init(
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    deletedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
     },
   },
   {

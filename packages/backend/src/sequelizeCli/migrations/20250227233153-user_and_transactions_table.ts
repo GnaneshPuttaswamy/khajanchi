@@ -118,6 +118,7 @@ export default {
 
       await dbTransaction.commit();
     } catch (error) {
+      console.error('Error in up migration: 20250227233153-user_and_transactions_table.ts :: error ==> ', error);
       await dbTransaction!.rollback();
       throw error;
     }
@@ -144,6 +145,7 @@ export default {
 
       await dbTransaction.commit();
     } catch (error) {
+      console.error('Error in down migration: 20250227233153-user_and_transactions_table.ts :: error ==> ', error);
       await dbTransaction!.rollback();
       throw error;
     }
