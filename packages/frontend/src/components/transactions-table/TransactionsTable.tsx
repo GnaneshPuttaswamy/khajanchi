@@ -21,6 +21,7 @@ import {
   TransactionsTableState,
 } from '../../reducers/transactionsTableReducer';
 import { CompactModeContext } from '../../context/CompactModeContext';
+import { convertPaiseToRupees } from '../../utils/currencyFormatter';
 const categoryColors: Record<string, string> = {
   food: 'green',
   entertainment: 'blue',
@@ -49,6 +50,7 @@ const baseColumns: TableProps<Transaction>['columns'] = [
     dataIndex: TRANSACTION_COLUMN_FIELDS.AMOUNT,
     width: '10%',
     minWidth: 100,
+    render: (text: number) => convertPaiseToRupees(text),
     sorter: (a, b) => a.amount - b.amount,
   },
   {
