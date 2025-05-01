@@ -74,12 +74,20 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
+    const currentSearchParams = new URLSearchParams(location.search);
+
     if (key === '1') {
       navigate('/dashboard');
     } else if (key === '2') {
-      navigate('/add-transaction');
+      navigate({
+        pathname: '/add-transaction',
+        search: currentSearchParams.toString(),
+      });
     } else if (key === '3') {
-      navigate('/transaction-history');
+      navigate({
+        pathname: '/transaction-history',
+        search: currentSearchParams.toString(),
+      });
     }
 
     // Close the menu on mobile after navigation

@@ -24,7 +24,7 @@ router.post('/transactions/bulk', async (req: Request, res: Response) => {
   await bulkAddTransactionUseCase.executeAndHandleErrors();
 });
 
-router.get('/transactions', async (req: Request<{}, {}, GetAllTransactionsQuery, {}>, res: Response) => {
+router.get('/transactions', async (req: Request<{}, {}, {}, GetAllTransactionsQuery>, res: Response) => {
   const getAllTransactionsUseCase = GetAllTransactionsUseCase.create(req, res);
   await getAllTransactionsUseCase.executeAndHandleErrors();
 });

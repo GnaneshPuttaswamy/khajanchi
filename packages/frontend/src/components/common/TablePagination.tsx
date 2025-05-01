@@ -1,26 +1,40 @@
-import { Pagination } from 'antd';
+import { Pagination, PaginationProps } from 'antd';
 import { Flex } from 'antd';
-import React, { useState } from 'react';
 
-function TablePagination() {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(20);
+interface TablePaginationProps {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  onPaginationChange: (page: number, pageSize: number) => void;
+}
+
+function TablePagination({
+  currentPage,
+  pageSize,
+  totalItems,
+  onPaginationChange,
+}: TablePaginationProps) {
+  const handlePaginationChange: PaginationProps['onChange'] = (page, size) => {
+    onPaginationChange(page, size);
+  };
 
   return (
     <Flex justify="flex-end">
       <Pagination
         current={currentPage}
         pageSize={pageSize}
+        total={totalItems}
         size="small"
-        onChange={(page, size) => {
-          setCurrentPage(page);
-          setPageSize(size || 20);
-        }}
+        onChange={handlePaginationChange}
         showSizeChanger
-        showTotal={(total) => `Total ${total} items`}
+        showTotal={(total, range) =>
+          `${range[0]}-${range[1]} of ${total} items`
+        }
         style={{
           paddingRight: 24,
         }}
+        pageSizeOptions={[5, 10, 20, 50, 100]}
+        defaultPageSize={10}
       />
     </Flex>
   );

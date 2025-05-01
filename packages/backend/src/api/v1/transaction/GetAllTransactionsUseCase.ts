@@ -4,11 +4,17 @@ import { BaseUseCase } from '../../BaseUseCase.js';
 import { GetAllTransactionsData, GetAllTransactionsQuery, getAllTransactionsQuerySchema } from './types.js';
 import { logger } from '../../../core/logger/logger.js';
 
-export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAllTransactionsData[]> {
+export class GetAllTransactionsUseCase extends BaseUseCase<
+  {},
+  {},
+  {},
+  GetAllTransactionsQuery,
+  GetAllTransactionsData[]
+> {
   transactionRepository: TransactionRepository;
 
   constructor(
-    request: Request<{}, {}, GetAllTransactionsQuery, {}>,
+    request: Request<{}, {}, {}, GetAllTransactionsQuery>,
     response: Response,
     transactionRepository: TransactionRepository
   ) {
@@ -17,7 +23,7 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
   }
 
   async validate() {
-    this.request.query = getAllTransactionsQuerySchema.parse(this.request.query);
+    this.parsedRequestQuery = getAllTransactionsQuerySchema.parse(this.request.query);
   }
 
   async execute() {
@@ -25,11 +31,14 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
     try {
       user = await this.authenticate();
 
-      const transactions = await this.transactionRepository.findAll({
+      const transactions = await this.transactionRepository.model().findAndCountAll({
         where: {
-          ...this.request.query,
+          isConfirmed: this.parsedRequestQuery.isConfirmed,
           userId: user.id,
         },
+        limit: this.limit,
+        offset: this.offset,
+        order: this.sequelizeOrderArray,
       });
 
       return transactions as unknown as GetAllTransactionsData[];
@@ -39,7 +48,7 @@ export class GetAllTransactionsUseCase extends BaseUseCase<{}, {}, {}, {}, GetAl
     }
   }
 
-  static create(request: Request<{}, {}, GetAllTransactionsQuery, {}>, response: Response) {
+  static create(request: Request<{}, {}, {}, GetAllTransactionsQuery>, response: Response) {
     return new GetAllTransactionsUseCase(request, response, new TransactionRepository());
   }
 }

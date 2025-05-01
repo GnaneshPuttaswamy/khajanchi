@@ -38,6 +38,7 @@ export class Logger {
       fileTransport = new winston.transports.File({
         filename: logFilePath,
         level: logLevel,
+        format: winston.format.combine(winston.format.prettyPrint()),
       });
 
       consoleTransport = new winston.transports.Console({
