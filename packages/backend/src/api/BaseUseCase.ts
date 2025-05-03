@@ -27,11 +27,18 @@ interface DefaultSortQuery {
   sortOrder?: string | string[];
 }
 
+interface DefaultDateQuery {
+  startDate?: string;
+  endDate?: string;
+}
+
 export abstract class BaseUseCase<
   TRequestParams = any,
   TResponseBody = any,
   TRequestBody = any,
-  TRequestQuery extends DefaultPaginationQuery & DefaultSortQuery = DefaultPaginationQuery & DefaultSortQuery,
+  TRequestQuery extends DefaultPaginationQuery & DefaultSortQuery & DefaultDateQuery = DefaultPaginationQuery &
+    DefaultSortQuery &
+    DefaultDateQuery,
   TData = any,
 > {
   request: Request<TRequestParams, TResponseBody, TRequestBody, TRequestQuery>;

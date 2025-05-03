@@ -18,19 +18,11 @@ interface AddExpenseFormProps {
 const parseTransactionText = async (
   transactionText: string
 ): Promise<Omit<Transaction, 'id'>[]> => {
-  try {
-    const response = await axiosInstance.post('/parse-transactions', {
-      transactionsDescription: transactionText,
-    });
+  const response = await axiosInstance.post('/parse-transactions', {
+    transactionsDescription: transactionText,
+  });
 
-    return response.data.data.transactions || [];
-  } catch (error) {
-    console.error(
-      'AddExpenseForm :: parseTransactionText() :: Error parsing transactions =>',
-      error
-    );
-    throw error;
-  }
+  return response.data.data.transactions || [];
 };
 
 function AddExpenseForm({
@@ -47,11 +39,6 @@ function AddExpenseForm({
       setLoading(true);
       const { transactionText } = values;
       const parsedTransactions = await parseTransactionText(transactionText);
-
-      console.log(
-        'AddExpenseForm :: handleFinish() :: parsedTransactions => ',
-        parsedTransactions
-      );
 
       await bulkAddTransactions(parsedTransactions);
 

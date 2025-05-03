@@ -44,10 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get('/users/profile');
-        console.log(
-          'AuthContext :: fetchUser() :: response.data.data => ',
-          response.data?.data
-        );
         setUser(response.data?.data);
       } catch (error) {
         console.error(

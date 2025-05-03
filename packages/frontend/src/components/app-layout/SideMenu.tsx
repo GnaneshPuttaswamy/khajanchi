@@ -74,20 +74,30 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    const currentSearchParams = new URLSearchParams(location.search);
+    const currentPath = location.pathname;
 
     if (key === '1') {
       navigate('/dashboard');
     } else if (key === '2') {
-      navigate({
-        pathname: '/add-transaction',
-        search: currentSearchParams.toString(),
-      });
+      // Only preserve search params if already on add-transaction page
+      if (currentPath === '/add-transaction') {
+        navigate({
+          pathname: '/add-transaction',
+          search: location.search,
+        });
+      } else {
+        navigate('/add-transaction');
+      }
     } else if (key === '3') {
-      navigate({
-        pathname: '/transaction-history',
-        search: currentSearchParams.toString(),
-      });
+      // Only preserve search params if already on transaction-history page
+      if (currentPath === '/transaction-history') {
+        navigate({
+          pathname: '/transaction-history',
+          search: location.search,
+        });
+      } else {
+        navigate('/transaction-history');
+      }
     }
 
     // Close the menu on mobile after navigation
@@ -101,7 +111,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
     if (path === '/dashboard') return ['1'];
     if (path === '/add-transaction') return ['2'];
     if (path === '/transaction-history') return ['3'];
-    return ['1']; // Default to Add Transaction
+    return ['1']; // Default to Dashboard
   };
 
   const handleSignOut = () => {

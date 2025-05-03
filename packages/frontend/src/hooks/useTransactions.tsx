@@ -10,6 +10,9 @@ interface UseTransactionsOptions {
   page?: number;
   pageSize?: number;
   sortInfo: SortInfo;
+  startDate: string | null;
+  endDate: string | null;
+  selectedCategories: string[];
 }
 
 interface UseTransactionsResult {
@@ -30,6 +33,9 @@ const useTransactions = ({
   page = 1,
   pageSize = 10,
   sortInfo,
+  startDate,
+  endDate,
+  selectedCategories,
 }: UseTransactionsOptions): UseTransactionsResult => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,8 +69,16 @@ const useTransactions = ({
           }
         });
 
+        if (startDate && endDate) {
+          params.append('startDate', startDate);
+          params.append('endDate', endDate);
+        }
+
+        selectedCategories.forEach((category) => {
+          params.append('categories', category);
+        });
+
         const apiUrl = `/transactions?${params.toString()}`;
-        console.log('Fetching transactions with URL:', apiUrl);
         const response = await axiosInstance.get(apiUrl);
 
         const responseData = response.data?.data;
@@ -92,7 +106,17 @@ const useTransactions = ({
     };
 
     fetchTransactions();
-  }, [baseUrl, isConfirmed, authToken, page, pageSize, sortInfo]);
+  }, [
+    baseUrl,
+    isConfirmed,
+    authToken,
+    page,
+    pageSize,
+    sortInfo,
+    startDate,
+    endDate,
+    selectedCategories,
+  ]);
 
   useEffect(() => {
     if (err) {

@@ -31,20 +31,10 @@ const SignIn: React.FC = () => {
 
   const googleSignin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(
-        'AuthContext :: googleSignin() :: onSuccess() :: tokenResponse => ',
-        tokenResponse
-      );
-
       try {
         const response = await axiosInstance.post('/users/google/login', {
           ...tokenResponse,
         });
-
-        console.log(
-          'AuthContext :: googleSignin() :: onSuccess() :: response => ',
-          response
-        );
 
         const token = response?.data?.data?.token;
 
@@ -57,11 +47,6 @@ const SignIn: React.FC = () => {
           throw new Error('Authentication token not found in response');
         }
       } catch (error: any) {
-        console.error(
-          'AuthContext :: googleSignin() :: onSuccess() :: /api/v1/auth/google/exchange-code error => ',
-          error
-        );
-
         const errorMessage =
           error.response?.data?.error?.message ||
           'Google Sign-In failed. Please try again.';
@@ -72,20 +57,12 @@ const SignIn: React.FC = () => {
       }
     },
     onError: (error) => {
-      console.log(
-        'AuthContext :: googleSignin() :: onError() :: error => ',
-        error
-      );
       messageApi.error(
         error?.error_description || 'Google Sign-In process failed.'
       );
       setIsGoogleLoading(false);
     },
     onNonOAuthError: (error) => {
-      console.log(
-        'AuthContext :: googleSignin() :: onNonOAuthError() :: error => ',
-        error
-      );
       setIsGoogleLoading(false);
     },
     flow: 'auth-code',

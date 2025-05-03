@@ -23,7 +23,8 @@ import {
 import { CompactModeContext } from '../../context/CompactModeContext';
 import { convertPaiseToRupees } from '../../utils/currencyFormatter';
 import { SortInfo } from '../pages/add-transaction-page/AddTransactionPage';
-const categoryColors: Record<string, string> = {
+
+export const categoryColors: Record<string, string> = {
   food: 'green',
   entertainment: 'blue',
   groceries: 'gold',
@@ -123,11 +124,6 @@ function TransactionsTable({
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [err, setErr] = useState<string | null>(null);
-
-  console.log(
-    `TransactionsTable :: ${isConfirmedTransactions} :: sortInfo =====> `,
-    sortInfo
-  );
 
   useEffect(() => {
     if (err) {
