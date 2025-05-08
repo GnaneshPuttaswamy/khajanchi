@@ -36,15 +36,14 @@ import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 
-// --- Recharts Components (PChart, LChart) remain the same as in your example ---
-// (Assuming PChart and LChart are correctly implemented placeholder chart components)
 function PChart() {
   const data = [
-    { name: 'Food', value: 400 },
-    { name: 'Transport', value: 300 },
-    { name: 'Shopping', value: 300 },
-    { name: 'Utilities', value: 200 },
-    { name: 'Other', value: 150 },
+    { name: 'Groceries', value: 35000 },
+    { name: 'Dining Out', value: 25000 },
+    { name: 'Transportation', value: 15000 },
+    { name: 'Utilities', value: 20000 },
+    { name: 'Entertainment', value: 18000 },
+    { name: 'Other', value: 10000 },
   ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AA00FF'];
@@ -57,7 +56,7 @@ function PChart() {
     innerRadius,
     outerRadius,
     percent,
-    name, // Add name to display category
+    name,
   }) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.6; // Adjust label position
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -120,12 +119,12 @@ function PChart() {
 function LChart() {
   // Example: Monthly spending data
   const data = [
-    { name: 'Jan', Expenses: 400000 },
-    { name: 'Feb', Expenses: 300000 },
-    { name: 'Mar', Expenses: 500000 },
-    { name: 'Apr', Expenses: 450000 },
-    { name: 'May', Expenses: 600000 },
-    { name: 'Jun', Expenses: 550000 },
+    { name: 'Jan', Expenses: 4500000 },
+    { name: 'Feb', Expenses: 3800000 },
+    { name: 'Mar', Expenses: 5200000 },
+    { name: 'Apr', Expenses: 4700000 },
+    { name: 'May', Expenses: 6100000 },
+    { name: 'Jun', Expenses: 5800000 },
   ];
   return (
     // Ensure the container has a defined height or aspect ratio
@@ -166,38 +165,45 @@ function LChart() {
 const recentTransactionsData = [
   {
     id: 1,
-    date: new Date(2024, 5, 28),
-    amount: 5500,
-    category: 'Food',
-    description: 'Lunch with colleagues',
+    date: dayjs().subtract(1, 'day').toDate(),
+    amount: 125000,
+    category: 'Groceries',
+    description: 'Weekly grocery shopping',
   },
   {
     id: 2,
-    date: new Date(2024, 5, 27),
-    amount: 12000,
-    category: 'Utilities',
-    description: 'Electricity Bill',
+    date: dayjs().subtract(2, 'days').toDate(),
+    amount: 35000,
+    category: 'Transportation',
+    description: 'Metro card top-up',
   },
   {
     id: 3,
-    date: new Date(2024, 5, 27),
-    amount: 8500,
-    category: 'Shopping',
-    description: 'New T-shirt',
+    date: dayjs().subtract(2, 'days').toDate(),
+    amount: 80000,
+    category: 'Dining Out',
+    description: 'Dinner with friends',
   },
   {
     id: 4,
-    date: new Date(2024, 5, 26),
-    amount: 3000,
-    category: 'Transport',
-    description: 'Metro card recharge',
+    date: dayjs().subtract(3, 'days').toDate(),
+    amount: 25000,
+    category: 'Entertainment',
+    description: 'Movie ticket',
   },
   {
     id: 5,
-    date: new Date(2024, 5, 25),
-    amount: 15000,
-    category: 'Entertainment',
-    description: 'Movie tickets',
+    date: dayjs().subtract(4, 'days').toDate(),
+    amount: 60000,
+    category: 'Shopping',
+    description: 'New headphones',
+  },
+  {
+    id: 6,
+    date: dayjs().subtract(5, 'days').toDate(),
+    amount: 150000,
+    category: 'Utilities',
+    description: 'Internet bill',
   },
 ];
 
@@ -207,17 +213,31 @@ function Dashboard() {
 
   // Placeholder data for Top Expenses List
   const topExpensesData = [
-    { category: 'Food & Dining', amount: 250000, percentage: 25 },
-    { category: 'Shopping', amount: 180000, percentage: 18 },
-    { category: 'Transportation', amount: 150000, percentage: 15 },
-    { category: 'Utilities', amount: 120000, percentage: 12 },
-    { category: 'Entertainment', amount: 100000, percentage: 10 },
-    { category: 'Health & Wellness', amount: 80000, percentage: 8 },
-    { category: 'Other', amount: 120000, percentage: 12 },
+    { category: 'Groceries', amount: 3500000, percentage: 29 },
+    { category: 'Dining Out', amount: 2500000, percentage: 21 },
+    { category: 'Utilities', amount: 2000000, percentage: 17 },
+    { category: 'Entertainment', amount: 1800000, percentage: 15 },
+    { category: 'Transportation', amount: 1500000, percentage: 12 },
+    { category: 'Other', amount: 1000000, percentage: 8 },
   ];
 
+  // Calculate Total Expenses from topExpensesData
+  const totalExpensesValue = topExpensesData.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+
+  // Calculate Avg Daily Spend (assuming a 30-day month for simplicity)
+  const avgDailySpendValue = totalExpensesValue / 30;
+
+  // Determine Highest Spending Category
+  const highestCategoryData = topExpensesData.reduce(
+    (max, item) => (item.amount > max.amount ? item : max),
+    topExpensesData[0] || { category: 'N/A', amount: 0 }
+  );
+
   // Example dynamic value for Month-over-Month change
-  const momChange = -5.5; // Example: 5.5% decrease
+  const momChange = 7.2;
 
   return (
     // Main Card acting as the page container
@@ -251,7 +271,7 @@ function Dashboard() {
             >
               <Statistic
                 title="Total Expenses"
-                value={convertPaiseToRupees(1000000)} // Example value
+                value={convertPaiseToRupees(totalExpensesValue)}
               />
             </Card>
           </Col>
@@ -262,7 +282,7 @@ function Dashboard() {
             >
               <Statistic
                 title="Avg Daily Spend"
-                value={convertPaiseToRupees(92000)}
+                value={convertPaiseToRupees(avgDailySpendValue)}
               />
             </Card>
           </Col>
@@ -273,7 +293,7 @@ function Dashboard() {
             >
               <Statistic
                 title="Highest Category" // Changed from Highest Expense
-                value="Food & Dining" // Display category name
+                value={highestCategoryData.category} // Display category name
                 // Optionally add amount below or in tooltip
               />
             </Card>
