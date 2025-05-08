@@ -57,6 +57,26 @@ export type GetTransactionData = AddTransactionData;
 // GetAllTransactionsUseCase
 export const getAllTransactionsQuerySchema = z.object({
   isConfirmed: z.preprocess((val) => val === 'true', z.boolean().optional().default(false)),
+  pageSize: z.string().optional(),
+  pageNumber: z.string().optional(),
+  sortBy: z.union([z.string(), z.array(z.string())]).optional(),
+  sortOrder: z.union([z.enum(['ASC', 'DESC']), z.array(z.enum(['ASC', 'DESC']))]).optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  categories: z.preprocess(
+    (val) => {
+      if (typeof val === 'string') {
+        return [val];
+      }
+
+      if (Array.isArray(val) && val.length > 0) {
+        return val;
+      }
+
+      return null;
+    },
+    z.union([z.string(), z.array(z.string()), z.null()]).optional()
+  ),
 });
 export type GetAllTransactionsQuery = z.infer<typeof getAllTransactionsQuerySchema>;
 

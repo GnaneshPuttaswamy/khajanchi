@@ -1,0 +1,88 @@
+services:
+  khajanchi-web:
+    build:
+      context: .
+      dockerfile: ./packages/frontend/Dockerfile.development
+    container_name: khajanchi-web-development
+    restart: unless-stopped
+    ports:
+      - "5174:5173"
+    volumes:
+      - khajanchi-web-node_modules-development:/usr/app/packages/frontend/node_modules
+      - ./packages/frontend:/usr/app/packages/frontend
+    depends_on:
+      khajanchi-api:
+        condition: service_healthy
+    networks:
+      - khajanchi-network-development
+
+  khajanchi-api:
+    build:
+      context: .
+      dockerfile: ./packages/backend/Dockerfile.development
+    container_name: khajanchi-api-development
+    restart: unless-stopped
+    env_file:
+      - ./packages/backend/.env.development
+    ports:
+      - "3001:3000"
+    volumes:
+      - khajanchi-api-node_modules-development:/usr/app/packages/backend/node_modules
+      - ./packages/backend/src:/usr/app/packages/backend/src
+      - ./packages/backend/.env.development:/usr/app/packages/backend/.env.development
+      - ./packages/backend/.sequelizerc:/usr/app/packages/backend/.sequelizerc
+      - ./packages/backend/logs:/usr/app/packages/backend/logs
+    depends_on:
+      khajanchi-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/v1/healthcheck', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - khajanchi-network-development
+
+  khajanchi-db:
+    image: postgres:17.4
+    container_name: khajanchi-db-development
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-khajanchi}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-khajanchi}
+      - POSTGRES_DATABASE=${DB_DATABASE:-khajanchi}
+    ports:
+      - "5433:5432"
+    volumes:
+      - khajanchi-db-data-development:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-U",
+          "${DB_USERNAME:-khajanchi}",
+          "-d",
+          "${DB_DATABASE:-khajanchi}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - khajanchi-network-development
+
+networks:
+  khajanchi-network-development:
+    driver: bridge
+
+volumes:
+  khajanchi-db-data-development:
+  khajanchi-api-node_modules-development:
+  khajanchi-web-node_modules-development:

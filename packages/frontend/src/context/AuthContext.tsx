@@ -2,30 +2,28 @@ import React, { createContext, useState, useEffect } from 'react';
 import { AUTH_ERROR_EVENT, axiosInstance } from '../utils/httpUtil';
 import { useNavigate } from 'react-router';
 import { message } from 'antd';
+import { googleLogout } from '@react-oauth/google';
 
 type User = {
   email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
 };
 
 type AuthContextType = {
   isAuthenticated: boolean;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
   isLoading: boolean;
   user: User | null;
-  signin: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
   signout: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
+  setIsAuthenticated: () => {},
   isLoading: true,
   user: null,
-  signin: async () => {
-    throw new Error('signin not implemented');
-  },
-  signup: async () => {
-    throw new Error('signup not implemented');
-  },
   signout: async () => {
     throw new Error('signout not implemented');
   },
@@ -46,10 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get('/users/profile');
-        console.log(
-          'AuthContext :: fetchUser() :: response.data.data => ',
-          response.data?.data
-        );
         setUser(response.data?.data);
       } catch (error) {
         console.error(
@@ -108,43 +102,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [navigate, messageApi]);
 
-  const signin = async (email: string, password: string) => {
-    try {
-      const response = await axiosInstance.post('/users/login', {
-        email,
-        password,
-      });
-
-      localStorage.setItem('authToken', response.data?.data?.token);
-      setIsAuthenticated(true);
-
-      messageApi.success('Successfully signed in!');
-    } catch (error) {
-      messageApi.error('Failed to sign in. Please check your credentials.');
-      throw error;
-    }
-  };
-
-  const signup = async (email: string, password: string) => {
-    try {
-      const response = await axiosInstance.post('/users/register', {
-        email,
-        password,
-      });
-
-      localStorage.setItem('authToken', response.data?.data?.token);
-      setIsAuthenticated(true);
-
-      messageApi.success('Successfully signed up!');
-    } catch (error) {
-      messageApi.error('Failed to sign up. Please try again.');
-      throw error;
-    }
-  };
-
   const signout = () => {
     localStorage.removeItem('authToken');
     setIsAuthenticated(false);
+    googleLogout();
 
     messageApi.info('You have been signed out.');
   };
@@ -153,7 +114,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <>
       {contextHolder}
       <AuthContext.Provider
-        value={{ isAuthenticated, isLoading, user, signin, signup, signout }}
+        value={{
+          isAuthenticated,
+          setIsAuthenticated,
+          isLoading,
+          user,
+          signout,
+        }}
       >
         {children}
       </AuthContext.Provider>

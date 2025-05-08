@@ -17,15 +17,38 @@ interface ApiResponse<T> {
   };
 }
 
+interface DefaultPaginationQuery {
+  pageSize?: string | number;
+  pageNumber?: string | number;
+}
+
+interface DefaultSortQuery {
+  sortBy?: string | string[];
+  sortOrder?: string | string[];
+}
+
+interface DefaultDateQuery {
+  startDate?: string;
+  endDate?: string;
+}
+
 export abstract class BaseUseCase<
   TRequestParams = any,
   TResponseBody = any,
   TRequestBody = any,
-  TRequestQuery = any,
+  TRequestQuery extends DefaultPaginationQuery & DefaultSortQuery & DefaultDateQuery = DefaultPaginationQuery &
+    DefaultSortQuery &
+    DefaultDateQuery,
   TData = any,
 > {
   request: Request<TRequestParams, TResponseBody, TRequestBody, TRequestQuery>;
   response: Response;
+
+  parsedRequestQuery!: TRequestQuery;
+
+  limit: number | undefined;
+  offset: number | undefined;
+  sequelizeOrderArray!: [string, 'ASC' | 'DESC'][];
 
   static success<T>(data: T): ApiResponse<T> {
     return {
@@ -58,6 +81,51 @@ export abstract class BaseUseCase<
   constructor(request: Request<TRequestParams, TResponseBody, TRequestBody, TRequestQuery>, response: Response) {
     this.request = request;
     this.response = response;
+  }
+
+  initializeLimitAndOffset() {
+    const numberRegex = /^\d+$/;
+
+    const pageSizeRes = numberRegex.exec(this.parsedRequestQuery?.pageSize as any);
+    const pageNumberRes = numberRegex.exec(this.parsedRequestQuery?.pageNumber as any);
+
+    if (!pageSizeRes || !pageNumberRes) {
+      this.limit = undefined;
+      this.offset = undefined;
+    }
+
+    if (pageSizeRes || pageNumberRes) {
+      this.limit = +pageSizeRes![0];
+      this.offset = (+pageNumberRes![0] - 1) * this.limit;
+    }
+
+    if (this.limit === 0) {
+      this.limit = undefined;
+      this.offset = undefined;
+    }
+  }
+
+  initializeSequelizeOrderArray() {
+    const { sortBy, sortOrder } = this.parsedRequestQuery || {};
+
+    const sortByArray = Array.isArray(sortBy) ? sortBy : sortBy ? [sortBy] : [];
+    const sortOrderArray = Array.isArray(sortOrder) ? sortOrder : sortOrder ? [sortOrder] : [];
+
+    const sortCriteria: [string, 'ASC' | 'DESC'][] = [];
+    const minLength = Math.min(sortByArray.length, sortOrderArray.length);
+
+    for (let i = 0; i < minLength; i++) {
+      const field = sortByArray[i];
+      const order = sortOrderArray[i]?.toUpperCase();
+
+      if (field && (order === 'ASC' || order === 'DESC')) {
+        sortCriteria.push([field, order]);
+      } else {
+        console.warn(`Invalid sort pair at index ${i}:`, { field, order });
+      }
+    }
+
+    this.sequelizeOrderArray = sortCriteria;
   }
 
   async authenticate() {
@@ -105,6 +173,8 @@ export abstract class BaseUseCase<
   async executeAndHandleErrors(): Promise<void> {
     try {
       await this.validate();
+      this.initializeLimitAndOffset();
+      this.initializeSequelizeOrderArray();
 
       const result = await this.execute();
 

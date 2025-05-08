@@ -21,6 +21,9 @@ export class GetUserProfileUseCase extends BaseUseCase<{}, {}, {}, {}, UserProfi
 
       return {
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatarUrl: user.avatarUrl,
       };
     } catch (error) {
       logger.error('GetUserProfileUseCase.execute() :: error', error);

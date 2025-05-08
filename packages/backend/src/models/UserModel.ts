@@ -6,12 +6,16 @@ export interface IUserAttributes {
   id: number;
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
+  googleSub: string;
+  avatarUrl: string;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }
 
-interface IUserCreationAttributes extends Optional<IUserAttributes, 'id'> {}
+export interface IUserCreationAttributes
+  extends Optional<IUserAttributes, 'id' | 'password' | 'firstName' | 'lastName' | 'googleSub' | 'avatarUrl'> {}
 
 export class UserModel extends Model<IUserAttributes, IUserCreationAttributes> {}
 
@@ -33,10 +37,23 @@ UserModel.init(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
+      allowNull: true,
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    googleSub: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    avatarUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -45,10 +62,6 @@ UserModel.init(
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    deletedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
     },
   },
   {

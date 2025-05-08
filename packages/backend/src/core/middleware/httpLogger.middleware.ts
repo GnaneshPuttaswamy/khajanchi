@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, query, Request, Response } from 'express';
 import { logger } from '../logger/logger.js';
 
 const httpLoggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -13,6 +13,8 @@ const httpLoggerMiddleware = (req: Request, res: Response, next: NextFunction) =
     userAgent: req.headers['user-agent'] || '',
     referrer: req.headers.referer || '',
     ...(process.env.NODE_ENV === 'development' && { body: req.body }), // Include body only in development for debugging
+    query: req?.query,
+    params: req?.params,
   });
 
   // Log when response finishes

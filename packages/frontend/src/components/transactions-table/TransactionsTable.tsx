@@ -1,14 +1,4 @@
-import {
-  Flex,
-  Form,
-  message,
-  Pagination,
-  Space,
-  Table,
-  TableProps,
-  Tag,
-  Tooltip,
-} from 'antd';
+import { Form, message, Space, Table, TableProps, Tag } from 'antd';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Transaction } from '../../types/types';
 import {
@@ -31,7 +21,10 @@ import {
   TransactionsTableState,
 } from '../../reducers/transactionsTableReducer';
 import { CompactModeContext } from '../../context/CompactModeContext';
-const categoryColors: Record<string, string> = {
+import { convertPaiseToRupees } from '../../utils/currencyFormatter';
+import { SortInfo } from '../pages/add-transaction-page/AddTransactionPage';
+
+export const categoryColors: Record<string, string> = {
   food: 'green',
   entertainment: 'blue',
   groceries: 'gold',
@@ -45,38 +38,59 @@ const categoryColors: Record<string, string> = {
 
 dayjs.extend(utc);
 
-const baseColumns: TableProps<Transaction>['columns'] = [
-  {
-    title: 'Date',
-    dataIndex: TRANSACTION_COLUMN_FIELDS.DATE,
-    width: '15%',
-    minWidth: 120,
-    render: (text: string) => dayjs.utc(text).local().format('Do, MMM YYYY'),
-  },
-  {
-    title: 'Amount',
-    dataIndex: TRANSACTION_COLUMN_FIELDS.AMOUNT,
-    width: '10%',
-    minWidth: 100,
-  },
-  {
-    title: 'Category',
-    dataIndex: TRANSACTION_COLUMN_FIELDS.CATEGORY,
-    width: '15%',
-    minWidth: 120,
-    render: (text: string) => {
-      const color = categoryColors[text.toLowerCase()] || '';
-      return <Tag color={color}>{text}</Tag>;
-    },
-  },
-  {
-    title: 'Description',
-    dataIndex: TRANSACTION_COLUMN_FIELDS.DESCRIPTION,
-    minWidth: 200,
-  },
-];
+const baseColumnsDefinition = (
+  sortInfo: SortInfo
+): TableProps<Transaction>['columns'] => {
+  const findSortOrder = (field: string) => {
+    return sortInfo?.find((obj) => obj.field === field)?.order || null;
+  };
 
-interface MyTableProps {
+  return [
+    {
+      title: 'Date',
+      dataIndex: TRANSACTION_COLUMN_FIELDS.DATE,
+      width: '15%',
+      minWidth: 120,
+      render: (text: string) => dayjs.utc(text).local().format('Do, MMM YYYY'),
+      sorter: {
+        multiple: 1,
+      },
+      sortOrder: findSortOrder(TRANSACTION_COLUMN_FIELDS.DATE),
+    },
+    {
+      title: 'Amount',
+      dataIndex: TRANSACTION_COLUMN_FIELDS.AMOUNT,
+      width: '10%',
+      minWidth: 100,
+      render: (text: number) => convertPaiseToRupees(text),
+      sorter: {
+        multiple: 2,
+      },
+      sortOrder: findSortOrder(TRANSACTION_COLUMN_FIELDS.AMOUNT),
+    },
+    {
+      title: 'Category',
+      dataIndex: TRANSACTION_COLUMN_FIELDS.CATEGORY,
+      width: '15%',
+      minWidth: 120,
+      render: (text: string) => {
+        const color = categoryColors[text.toLowerCase()] || '';
+        return <Tag color={color}>{text}</Tag>;
+      },
+      sorter: {
+        multiple: 3,
+      },
+      sortOrder: findSortOrder(TRANSACTION_COLUMN_FIELDS.CATEGORY),
+    },
+    {
+      title: 'Description',
+      dataIndex: TRANSACTION_COLUMN_FIELDS.DESCRIPTION,
+      minWidth: 200,
+    },
+  ];
+};
+
+interface TransactionsTableProps {
   transactions: Transaction[];
   isConfirmedTransactions: boolean;
   deleteTransaction: (id: React.Key) => Promise<void>;
@@ -85,6 +99,8 @@ interface MyTableProps {
     updatedTransaction: Partial<Omit<Transaction, 'id'>>
   ) => Promise<void>;
   refreshTransactions: (isConfirmed: boolean) => void;
+  onTableChange: TableProps<Transaction>['onChange'];
+  sortInfo: SortInfo;
 }
 
 const initialState: TransactionsTableState = {
@@ -101,7 +117,9 @@ function TransactionsTable({
   deleteTransaction,
   refreshTransactions,
   updateTransaction,
-}: MyTableProps) {
+  onTableChange,
+  sortInfo,
+}: TransactionsTableProps) {
   const { isCompact } = useContext(CompactModeContext);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -122,6 +140,9 @@ function TransactionsTable({
     transactionsTableReducer,
     initialState
   );
+
+  const baseColumns = baseColumnsDefinition(sortInfo);
+
   const {
     currentlyEditingId,
     isFormDisabled,
@@ -375,9 +396,6 @@ function TransactionsTable({
     }
   );
 
-  // const [currentPage, setCurrentPage] = useState<number>(1);
-  // const [pageSize, setPageSize] = useState<number>(20);
-
   return (
     <>
       {contextHolder}
@@ -395,27 +413,12 @@ function TransactionsTable({
           scroll={{
             x: 'max-content',
             y: isConfirmedTransactions
-              ? `calc(100vh - ${isCompact ? 230 : 280}px)`
-              : `calc(100vh - ${isCompact ? 440 : 550}px)`,
+              ? `calc(100vh - ${isCompact ? 244 : 283}px)`
+              : `calc(100vh - ${isCompact ? 499 : 598}px)`,
           }}
+          onChange={onTableChange}
         ></Table>
       </Form>
-      {/* {isConfirmedTransactions && (
-        <Flex vertical={false} justify="flex-end">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            size="small"
-            total={transactions.length}
-            onChange={(page, size) => {
-              setCurrentPage(page);
-              setPageSize(size || 20);
-            }}
-            showSizeChanger
-            showTotal={(total) => `Total ${total} items`}
-          />
-        </Flex>
-      )} */}
     </>
   );
 }

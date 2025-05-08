@@ -1,11 +1,11 @@
 export default {
   development: {
-    username: process.env.DB_USERNAME || 'root',
-    password: process.env.DB_PASSWORD || 'mydbpwd',
+    username: process.env.DB_USERNAME || 'khajanchi',
+    password: process.env.DB_PASSWORD || 'khajanchi',
     database: process.env.DB_DATABASE || 'khajanchi',
-    host: process.env.DB_HOST || 'db',
-    port: parseInt(process.env.DB_PORT || '3306'),
-    dialect: process.env.DB_DIALECT || 'mysql',
+    host: process.env.DB_HOST || 'khajanchi-db',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    dialect: process.env.DB_DIALECT || 'postgres',
     seederStorage: 'sequelize',
   },
   test: {
@@ -13,8 +13,8 @@ export default {
     password: process.env.CI_DB_PASSWORD,
     database: process.env.CI_DB_NAME,
     host: '127.0.0.1',
-    port: 3306,
-    dialect: 'mysql',
+    port: 5432,
+    dialect: 'postgres',
     dialectOptions: {
       bigNumberStrings: true,
     },
@@ -24,8 +24,8 @@ export default {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '3306'),
-    dialect: process.env.DB_DIALECT || 'mysql',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    dialect: process.env.DB_DIALECT || 'postgres',
     seederStorage: 'sequelize',
     dialectOptions: {
       bigNumberStrings: true,

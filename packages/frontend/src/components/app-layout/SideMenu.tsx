@@ -16,6 +16,7 @@ import {
   HistoryOutlined,
   DownOutlined,
   LogoutOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { ThemeContext } from '../../context/ThemeContext';
@@ -56,29 +57,47 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
 
   const items: MenuItem[] = [
     getItem(
-      <Typography.Text>Add Transaction</Typography.Text>,
+      <Typography.Text>Dashboard</Typography.Text>,
       '1',
+      <LineChartOutlined />
+    ),
+    getItem(
+      <Typography.Text>Add Transaction</Typography.Text>,
+      '2',
       <TransactionOutlined />
     ),
     getItem(
       <Typography.Text>Transaction History</Typography.Text>,
-      '2',
+      '3',
       <HistoryOutlined />
     ),
-    // getItem(
-    //   <Typography.Text>Settings</Typography.Text>,
-    //   '3',
-    //   <SettingOutlined />
-    // ),
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
+    const currentPath = location.pathname;
+
     if (key === '1') {
-      navigate('/add-transaction');
+      navigate('/dashboard');
     } else if (key === '2') {
-      navigate('/transaction-history');
+      // Only preserve search params if already on add-transaction page
+      if (currentPath === '/add-transaction') {
+        navigate({
+          pathname: '/add-transaction',
+          search: location.search,
+        });
+      } else {
+        navigate('/add-transaction');
+      }
     } else if (key === '3') {
-      navigate('/settings');
+      // Only preserve search params if already on transaction-history page
+      if (currentPath === '/transaction-history') {
+        navigate({
+          pathname: '/transaction-history',
+          search: location.search,
+        });
+      } else {
+        navigate('/transaction-history');
+      }
     }
 
     // Close the menu on mobile after navigation
@@ -89,10 +108,10 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
 
   const getSelectedKey = () => {
     const path = location.pathname;
-    if (path === '/add-transaction') return ['1'];
-    if (path === '/transaction-history') return ['2'];
-    if (path === '/settings') return ['3'];
-    return ['1']; // Default to Add Transaction
+    if (path === '/dashboard') return ['1'];
+    if (path === '/add-transaction') return ['2'];
+    if (path === '/transaction-history') return ['3'];
+    return ['1']; // Default to Dashboard
   };
 
   const handleSignOut = () => {
@@ -122,22 +141,29 @@ const SideMenu: React.FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
           pointerEvents: collapsed ? 'none' : 'auto',
         }}
       >
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+        <Dropdown menu={{ items: userMenuItems }}>
           <Flex gap="small" align="center">
             <Avatar
               size={!isMobile ? 'large' : undefined}
               icon={<UserOutlined />}
+              src={user?.avatarUrl}
             />
             <Typography.Text ellipsis={{ tooltip: true }} strong>
-              {truncateText(user?.email || 'puttadt@gmail.com', 15)}
+              {truncateText(user?.firstName || '---', 15)}
             </Typography.Text>
-            <DownOutlined
-              style={{
-                fontSize: 10,
-                position: 'relative',
-                top: 1,
-              }}
-            />
+            <Button
+              type="text"
+              size="small"
+              icon={
+                <DownOutlined
+                  size={8}
+                  style={{
+                    top: 1,
+                    position: 'relative',
+                  }}
+                />
+              }
+            ></Button>
           </Flex>
         </Dropdown>
         <Button

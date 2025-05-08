@@ -11,6 +11,7 @@ import {
 } from './types.js';
 import { UpdateTransactionUseCase } from './UpdateTransactionUseCase.js';
 import { BulkAddTransactionUseCase } from './BulkAddTransactionUseCase.js';
+import { GetAllUniqueCategoriesUseCase } from './GetAllUniqueCategoriesUseCase.js';
 
 const router = express.Router();
 
@@ -24,9 +25,14 @@ router.post('/transactions/bulk', async (req: Request, res: Response) => {
   await bulkAddTransactionUseCase.executeAndHandleErrors();
 });
 
-router.get('/transactions', async (req: Request<{}, {}, GetAllTransactionsQuery, {}>, res: Response) => {
+router.get('/transactions', async (req: Request<{}, {}, {}, GetAllTransactionsQuery>, res: Response) => {
   const getAllTransactionsUseCase = GetAllTransactionsUseCase.create(req, res);
   await getAllTransactionsUseCase.executeAndHandleErrors();
+});
+
+router.get('/transactions/categories', async (req: Request<{}, {}, {}, {}>, res: Response) => {
+  const getAllUniqueCategoriesUseCase = GetAllUniqueCategoriesUseCase.create(req, res);
+  await getAllUniqueCategoriesUseCase.executeAndHandleErrors();
 });
 
 router.get('/transactions/:id', async (req: Request<GetTransactionParams>, res: Response) => {

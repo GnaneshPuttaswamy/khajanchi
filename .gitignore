@@ -143,6 +143,8 @@ dist/
 
 # project specific
 .env
+.env.development
+.env.production
 
 # other
 scratch/
